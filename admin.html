@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>admin — tiny shots</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: #c0c0c0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23c0c0c0'/%3E%3Crect width='1' height='1' x='0' y='0' fill='%23a0a0a0'/%3E%3Crect width='1' height='1' x='2' y='2' fill='%23a0a0a0'/%3E%3C/svg%3E");
+      color: #000;
+      font-family: 'Chicago', 'Geneva', 'Charcoal', 'Lucida Grande', sans-serif;
+      min-height: 100vh;
+      cursor: default;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+      z-index: 9999;
+      mix-blend-mode: multiply;
+    }
+
+    .window {
+      max-width: 500px;
+      margin: 24px auto;
+      border: 2px solid #000;
+      box-shadow: 4px 4px 0 #000;
+      background: #fff;
+    }
+
+    .title-bar {
+      background: #fff;
+      border-bottom: 2px solid #000;
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: grab;
+      background-image:
+        repeating-linear-gradient(
+          transparent 0px, transparent 1px,
+          #000 1px, #000 2px,
+          transparent 2px, transparent 3px
+        );
+    }
+
+    .title-bar-text {
+      background: #fff;
+      padding: 0 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .close-box {
+      width: 14px;
+      height: 14px;
+      border: 2px solid #000;
+      background: #fff;
+      flex-shrink: 0;
+    }
+
+    .window-body {
+      padding: 20px 24px 28px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      letter-spacing: 6px;
+      font-weight: 900;
+      text-transform: lowercase;
+    }
+
+    header .subtitle {
+      font-size: 0.7rem;
+      color: #444;
+      font-style: italic;
+      margin-top: 4px;
+      font-family: 'Courier New', monospace;
+    }
+
+    hr.dashed { border: none; height: 0; border-top: 2px dashed #000; margin: 14px 0; }
+    hr.divider { border: none; height: 2px; background: #000; margin: 14px 0; }
+
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .menu-item {
+      display: block;
+      text-decoration: none;
+      border: 2px solid #000;
+      padding: 14px 16px;
+      background: #fff;
+      color: #000;
+      transition: box-shadow 0.1s, transform 0.1s;
+      cursor: pointer;
+    }
+
+    .menu-item:hover {
+      box-shadow: 3px 3px 0 #000;
+      transform: translate(-1px, -1px);
+    }
+
+    .menu-item:active {
+      box-shadow: 1px 1px 0 #000;
+      transform: translate(0, 0);
+    }
+
+    .menu-item-title {
+      font-size: 0.85rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .menu-item-desc {
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      color: #555;
+      letter-spacing: 0.5px;
+    }
+
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #555;
+      font-family: 'Courier New', monospace;
+      text-decoration: none;
+    }
+
+    .back:hover { color: #000; }
+
+    ::-webkit-scrollbar { width: 16px; }
+    ::-webkit-scrollbar-track { background: #c0c0c0; border-left: 1px solid #000; }
+    ::-webkit-scrollbar-thumb { background: #fff; border: 2px solid #000; }
+
+    @media (max-width: 520px) {
+      .window { margin: 8px; }
+      .window-body { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+<div class="window">
+  <div class="title-bar">
+    <div class="close-box"></div>
+    <span class="title-bar-text">admin — tiny shots</span>
+  </div>
+  <div class="window-body">
+
+    <header>
+      <h1>admin</h1>
+      <p class="subtitle">manage your gallery</p>
+    </header>
+
+    <hr class="dashed">
+
+    <nav class="menu">
+      <a class="menu-item" href="/upload.html">
+        <div class="menu-item-title">upload</div>
+        <div class="menu-item-desc">add new photos to a roll</div>
+      </a>
+      <a class="menu-item" href="/manage.html">
+        <div class="menu-item-title">manage</div>
+        <div class="menu-item-desc">edit captions, reassign rolls, delete photos</div>
+      </a>
+    </nav>
+
+    <hr class="divider">
+
+    <a class="back" href="/">&#8592; back to gallery</a>
+
+  </div>
+</div>
+</body>
+</html>
