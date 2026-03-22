@@ -4,17 +4,10 @@
 
 This site is live at **shots.catrow.net**, served via GitHub Pages from the `main` branch.
 
-### After completing any task:
+### How deployment works
 
-1. Commit and push your changes to the `claude/*` working branch
-2. Merge those changes into `main` and push `main`:
-   ```
-   git checkout main
-   git pull origin main
-   git merge --no-ff <your-claude-branch> -m "Merge <branch-name> into main"
-   git push -u origin main
-   git checkout <your-claude-branch>
-   ```
-3. This triggers the GitHub Actions deployment to shots.catrow.net automatically.
+When you push to a `claude/*` branch, a GitHub Actions workflow automatically merges it into `main`, which then triggers deployment to shots.catrow.net.
 
-**Always do this at the end of every session** so the live site reflects your work.
+**Just push your changes to your `claude/*` branch and deployment happens automatically.**
+
+No manual merging needed.
