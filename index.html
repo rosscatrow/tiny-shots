@@ -153,24 +153,14 @@
       transform: translate(0, 0);
     }
 
-    /* frame number */
-    .frame-num {
-      font-size: 0.6rem;
-      color: #000;
-      font-weight: 700;
-      letter-spacing: 2px;
-      margin-bottom: 4px;
-      display: block;
-      font-family: 'Courier New', monospace;
-    }
-
     /* title */
     .card-title {
-      font-size: 0.75rem;
+      font-size: 0.85rem;
       color: #000;
       font-weight: 700;
       margin-bottom: 6px;
       text-align: center;
+      font-family: 'Courier New', monospace;
     }
 
     /* photo */
@@ -276,11 +266,6 @@
     photos.forEach((photo, i) => {
       const card = document.createElement('div');
       card.className = 'card';
-
-      const frameNum = document.createElement('span');
-      frameNum.className = 'frame-num';
-      frameNum.textContent = 'frame ' + pad(i + 1);
-      card.appendChild(frameNum);
 
       if (photo.title) {
         const title = document.createElement('p');
