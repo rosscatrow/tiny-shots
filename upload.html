@@ -4,200 +4,234 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>upload — tiny shots</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --paper: #f0ead6;
-      --ink: #2a2016;
-      --ink-faint: rgba(42, 32, 22, 0.12);
-      --red: #d94f30;
-      --green: #3a7d44;
-      --grid: 28px;
-    }
-
     body {
-      background-color: var(--paper);
-      color: var(--ink);
-      font-family: 'Courier Prime', 'Courier New', monospace;
+      background-color: #c0c0c0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23c0c0c0'/%3E%3Crect width='1' height='1' x='0' y='0' fill='%23a0a0a0'/%3E%3Crect width='1' height='1' x='2' y='2' fill='%23a0a0a0'/%3E%3C/svg%3E");
+      color: #000;
+      font-family: 'Chicago', 'Geneva', 'Charcoal', 'Lucida Grande', sans-serif;
       min-height: 100vh;
-      background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      background-repeat: repeat;
+      cursor: default;
     }
 
-    body::before {
+    body::after {
       content: '';
       position: fixed;
       inset: 0;
       pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+      z-index: 9999;
+      mix-blend-mode: multiply;
+    }
+
+    /* ── window chrome ── */
+    .window {
+      max-width: 600px;
+      margin: 24px auto;
+      border: 2px solid #000;
+      box-shadow: 4px 4px 0 #000;
+      background: #fff;
+    }
+
+    .title-bar {
+      background: #fff;
+      border-bottom: 2px solid #000;
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: grab;
       background-image:
-        linear-gradient(var(--ink-faint) 1px, transparent 1px),
-        linear-gradient(90deg, var(--ink-faint) 1px, transparent 1px);
-      background-size: var(--grid) var(--grid);
-      z-index: 0;
+        repeating-linear-gradient(
+          transparent 0px, transparent 1px,
+          #000 1px, #000 2px,
+          transparent 2px, transparent 3px
+        );
     }
 
-    .page {
-      position: relative;
-      z-index: 1;
-      max-width: 540px;
-      margin: 0 auto;
-      padding: 48px 24px 64px;
+    .title-bar-text {
+      background: #fff;
+      padding: 0 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      white-space: nowrap;
     }
 
+    .close-box {
+      width: 14px;
+      height: 14px;
+      border: 2px solid #000;
+      background: #fff;
+      flex-shrink: 0;
+    }
+
+    .window-body {
+      padding: 20px 24px 28px;
+    }
+
+    /* ── header ── */
     header {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 20px;
     }
 
     header h1 {
-      font-family: 'Instrument Serif', Georgia, serif;
-      font-style: italic;
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 400;
-      letter-spacing: -0.02em;
-      line-height: 1;
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      letter-spacing: 6px;
+      font-weight: 900;
+      text-transform: lowercase;
+      color: #000;
     }
 
     header .subtitle {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      margin-top: 10px;
-      opacity: 0.55;
+      font-size: 0.7rem;
+      color: #444;
+      font-style: italic;
+      margin-top: 4px;
+      font-family: 'Courier New', monospace;
     }
 
-    /* ── setup section ── */
-    .setup {
-      margin-bottom: 32px;
+    hr.divider {
+      border: none;
+      height: 2px;
+      background: #000;
+      margin: 14px 0;
     }
 
+    hr.dashed {
+      border: none;
+      height: 0;
+      border-top: 2px dashed #000;
+      margin: 14px 0;
+    }
+
+    /* ── labels ── */
     label {
       display: block;
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 2px;
       margin-bottom: 6px;
-      opacity: 0.6;
-    }
-
-    input[type="password"] {
-      width: 100%;
-      font-family: 'Courier Prime', monospace;
-      font-size: 0.85rem;
-      padding: 10px 12px;
-      border: 1px solid var(--ink-faint);
-      background: #fff;
-      color: var(--ink);
-      border-radius: 2px;
-    }
-
-    input[type="password"]:focus {
-      outline: 2px solid var(--red);
-      outline-offset: 1px;
+      color: #555;
+      font-family: 'Courier New', monospace;
     }
 
     .hint {
       font-size: 0.6rem;
-      opacity: 0.4;
+      color: #666;
       margin-top: 4px;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.5px;
     }
 
-    /* ── roll section ── */
-    .roll-section {
-      margin-bottom: 32px;
+    /* ── sections ── */
+    .setup, .roll-section {
+      margin-bottom: 16px;
     }
 
+    /* ── inputs ── */
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      padding: 6px 8px;
+      border: 2px solid #000;
+      background: #fff;
+      color: #000;
+      outline: none;
+    }
+
+    input[type="password"]:focus,
+    input[type="text"]:focus {
+      background: #f0f0f0;
+    }
+
+    /* ── roll chips ── */
     .roll-chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
       margin: 8px 0;
     }
 
     .roll-chip {
-      font-family: 'Courier Prime', monospace;
+      font-family: 'Courier New', monospace;
       font-size: 0.7rem;
-      letter-spacing: 0.06em;
-      padding: 5px 12px;
-      border: 1px solid var(--ink-faint);
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border: 2px solid #000;
       background: #fff;
       cursor: pointer;
-      color: var(--ink);
-      border-radius: 2px;
-      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      color: #000;
+      text-transform: lowercase;
+    }
+
+    .roll-chip:hover:not(.selected) {
+      background: #eee;
     }
 
     .roll-chip.selected {
-      background: var(--ink);
-      color: var(--paper);
-      border-color: var(--ink);
+      background: #000;
+      color: #fff;
     }
 
     .roll-chip.new-roll-chip {
       border-style: dashed;
-      opacity: 0.65;
+      color: #555;
     }
 
-    .roll-chip.new-roll-chip:hover {
-      opacity: 1;
-      border-color: var(--red);
-      color: var(--red);
+    .roll-chip.new-roll-chip:hover,
+    .roll-chip.new-roll-chip.selected {
+      background: #000;
+      color: #fff;
+      border-style: solid;
     }
 
     .new-roll-form {
       display: flex;
-      gap: 10px;
-      margin-top: 10px;
+      gap: 8px;
+      margin-top: 8px;
     }
 
     .new-roll-form input[type="text"] {
+      width: auto;
       flex: 1;
-      font-family: 'Courier Prime', monospace;
-      font-size: 0.85rem;
-      padding: 8px 10px;
-      border: 1px solid var(--ink-faint);
-      background: #fff;
-      color: var(--ink);
-      border-radius: 2px;
     }
 
-    .new-roll-form input[type="text"]:focus {
-      outline: 2px solid var(--red);
-      outline-offset: 1px;
+    .new-roll-form input[type="text"]:last-child {
+      max-width: 110px;
     }
 
     /* ── upload area ── */
     .upload-area {
-      border: 2px dashed var(--ink-faint);
-      border-radius: 4px;
-      padding: 40px 20px;
+      border: 2px dashed #000;
+      padding: 36px 20px;
       text-align: center;
       cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
+      transition: background 0.1s;
     }
 
     .upload-area:hover,
     .upload-area.dragover {
-      border-color: var(--red);
-      background: rgba(217, 79, 48, 0.04);
+      background: #f0f0f0;
     }
 
     .upload-area .icon {
-      font-size: 2rem;
-      margin-bottom: 8px;
+      font-size: 1.6rem;
+      margin-bottom: 6px;
     }
 
     .upload-area p {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      opacity: 0.55;
+      letter-spacing: 2px;
+      color: #555;
+      font-family: 'Courier New', monospace;
     }
 
     input[type="file"] { display: none; }
@@ -206,8 +240,8 @@
     .preview-strip {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 24px;
+      gap: 10px;
+      margin-bottom: 16px;
     }
 
     .preview-item {
@@ -219,142 +253,172 @@
       width: 80px;
       height: 60px;
       object-fit: cover;
-      border: 2px solid #fff;
-      box-shadow: 1px 2px 6px rgba(42, 32, 22, 0.15);
+      border: 2px solid #000;
+      display: block;
     }
 
     .preview-item .remove {
       position: absolute;
       top: -6px;
       right: -6px;
-      width: 18px;
-      height: 18px;
-      background: var(--red);
+      width: 16px;
+      height: 16px;
+      background: #000;
       color: #fff;
       border: none;
-      border-radius: 50%;
-      font-size: 0.6rem;
+      font-size: 0.55rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       line-height: 1;
+      font-family: 'Courier New', monospace;
     }
 
     .preview-item input {
       width: 80px;
-      font-family: 'Courier Prime', monospace;
+      font-family: 'Courier New', monospace;
       font-size: 0.55rem;
-      padding: 3px 4px;
-      border: 1px solid var(--ink-faint);
+      padding: 2px 4px;
+      border: 1px solid #000;
+      border-top: none;
       background: #fff;
-      margin-top: 4px;
       text-align: center;
     }
 
-    /* ── buttons ── */
+    /* ── upload button ── */
     .btn {
       display: block;
       width: 100%;
-      font-family: 'Courier Prime', monospace;
+      font-family: 'Chicago', 'Geneva', 'Charcoal', 'Lucida Grande', sans-serif;
       font-size: 0.8rem;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      padding: 14px;
-      border: none;
+      letter-spacing: 2px;
+      padding: 10px;
+      border: 2px solid #000;
+      background: #fff;
+      color: #000;
       cursor: pointer;
-      border-radius: 2px;
-      transition: opacity 0.2s;
+      box-shadow: 3px 3px 0 #000;
+      transition: box-shadow 0.1s, transform 0.1s;
+    }
+
+    .btn:hover:not(:disabled) {
+      box-shadow: 1px 1px 0 #000;
+      transform: translate(2px, 2px);
+    }
+
+    .btn:active:not(:disabled) {
+      box-shadow: none;
+      transform: translate(3px, 3px);
     }
 
     .btn:disabled {
-      opacity: 0.3;
+      opacity: 0.35;
       cursor: not-allowed;
-    }
-
-    .btn-upload {
-      background: var(--red);
-      color: #fff;
-    }
-
-    .btn-upload:hover:not(:disabled) {
-      opacity: 0.85;
+      box-shadow: none;
     }
 
     /* ── log ── */
     .log {
-      margin-top: 20px;
-      font-size: 0.7rem;
-      line-height: 1.7;
-      opacity: 0.6;
-      max-height: 200px;
+      margin-top: 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      line-height: 1.8;
+      max-height: 160px;
       overflow-y: auto;
+      color: #333;
     }
 
-    .log .ok { color: var(--green); }
-    .log .err { color: var(--red); }
+    .log .ok  { color: #000; font-weight: bold; }
+    .log .err { color: #000; text-decoration: underline; }
 
     /* ── back link ── */
     .back {
       display: block;
       text-align: center;
-      margin-top: 40px;
-      font-size: 0.65rem;
+      margin-top: 20px;
+      font-size: 0.6rem;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--ink);
-      opacity: 0.4;
+      letter-spacing: 2px;
+      color: #555;
+      font-family: 'Courier New', monospace;
+      text-decoration: none;
     }
 
-    .back:hover { opacity: 0.7; }
+    .back:hover { color: #000; }
+
+    /* ── scrollbar ── */
+    ::-webkit-scrollbar { width: 16px; }
+    ::-webkit-scrollbar-track { background: #c0c0c0; border-left: 1px solid #000; }
+    ::-webkit-scrollbar-thumb { background: #fff; border: 2px solid #000; }
+
+    @media (max-width: 520px) {
+      .window { margin: 8px; }
+      .window-body { padding: 14px; }
+    }
   </style>
 </head>
 <body>
-<div class="page">
-
-  <header>
-    <h1>upload</h1>
-    <p class="subtitle">add shots to the gallery</p>
-  </header>
-
-  <!-- token setup -->
-  <div class="setup">
-    <label for="token">GitHub Token</label>
-    <input type="password" id="token" placeholder="ghp_... or github_pat_...">
-    <p class="hint">needs repo contents write access &mdash; saved in your browser only</p>
+<div class="window">
+  <div class="title-bar">
+    <div class="close-box"></div>
+    <span class="title-bar-text">upload — tiny shots</span>
   </div>
+  <div class="window-body">
 
-  <!-- roll selection -->
-  <div class="roll-section">
-    <label>Roll</label>
-    <div class="roll-chips" id="rollChips">
-      <button class="roll-chip new-roll-chip" id="newRollChip" type="button">+ new roll</button>
+    <header>
+      <h1>upload</h1>
+      <p class="subtitle">add shots to the gallery</p>
+    </header>
+
+    <hr class="dashed">
+
+    <!-- token setup -->
+    <div class="setup">
+      <label for="token">GitHub Token</label>
+      <input type="password" id="token" placeholder="ghp_... or github_pat_...">
+      <p class="hint">needs repo contents write access &mdash; saved in your browser only</p>
     </div>
-    <div class="new-roll-form" id="newRollForm" style="display:none">
-      <input type="text" id="rollName" placeholder="roll name">
-      <input type="text" id="rollDate" placeholder="YYYY-MM" style="max-width:110px">
+
+    <hr class="dashed">
+
+    <!-- roll selection -->
+    <div class="roll-section">
+      <label>Roll</label>
+      <div class="roll-chips" id="rollChips">
+        <button class="roll-chip new-roll-chip" id="newRollChip" type="button">+ new roll</button>
+      </div>
+      <div class="new-roll-form" id="newRollForm" style="display:none">
+        <input type="text" id="rollName" placeholder="roll name">
+        <input type="text" id="rollDate" placeholder="YYYY-MM">
+      </div>
+      <p class="hint">photos will be grouped under this roll</p>
     </div>
-    <p class="hint">photos will be grouped under this roll</p>
+
+    <hr class="dashed">
+
+    <!-- file picker -->
+    <div class="upload-area" id="dropzone">
+      <div class="icon">+</div>
+      <p>tap to pick photos</p>
+    </div>
+    <input type="file" id="picker" accept="image/*" multiple>
+
+    <!-- previews -->
+    <div class="preview-strip" id="previews"></div>
+
+    <!-- upload button -->
+    <button class="btn" id="uploadBtn" disabled>Upload</button>
+
+    <!-- status log -->
+    <div class="log" id="log"></div>
+
+    <hr class="divider">
+
+    <a class="back" href="/">&#8592; back to gallery</a>
+
   </div>
-
-  <!-- file picker -->
-  <div class="upload-area" id="dropzone">
-    <div class="icon">+</div>
-    <p>tap to pick photos</p>
-  </div>
-  <input type="file" id="picker" accept="image/*" multiple>
-
-  <!-- previews -->
-  <div class="preview-strip" id="previews"></div>
-
-  <!-- upload button -->
-  <button class="btn btn-upload" id="uploadBtn" disabled>Upload</button>
-
-  <!-- status log -->
-  <div class="log" id="log"></div>
-
-  <a class="back" href="/">&#8592; back to gallery</a>
-
 </div>
 
 <script>
