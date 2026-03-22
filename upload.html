@@ -692,7 +692,7 @@
         // base64 content (strip data url prefix)
         const base64 = item.dataUrl.split(',')[1];
 
-        const putRes = await fetch(`${API}/repos/${REPO}/contents/${path}`, {
+        const putRes = await fetchWithRetry(`${API}/repos/${REPO}/contents/${path}`, {
           method: 'PUT',
           headers,
           body: JSON.stringify({
@@ -704,9 +704,9 @@
 
         if (putRes.status === 422) {
           // file already exists, update it
-          const existingRes = await fetch(`${API}/repos/${REPO}/contents/${path}?ref=${BRANCH}`, { headers });
+          const existingRes = await fetchWithRetry(`${API}/repos/${REPO}/contents/${path}?ref=${BRANCH}`, { headers });
           const existingData = await existingRes.json();
-          const updateRes = await fetch(`${API}/repos/${REPO}/contents/${path}`, {
+          const updateRes = await fetchWithRetry(`${API}/repos/${REPO}/contents/${path}`, {
             method: 'PUT',
             headers,
             body: JSON.stringify({
@@ -772,6 +772,22 @@
       appendLog(err.message, 'err');
     } finally {
       uploadBtn.disabled = selectedFiles.length === 0;
+    }
+  }
+
+  async function fetchWithRetry(url, options = {}, retries = 3, timeoutMs = 60000) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const res = await fetch(url, { ...options, signal: controller.signal });
+        clearTimeout(timer);
+        return res;
+      } catch (err) {
+        clearTimeout(timer);
+        if (attempt === retries) throw new Error(err.name === 'AbortError' ? 'upload timed out' : 'network error — check your connection');
+        await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)));
+      }
     }
   }
 
