@@ -8,61 +8,127 @@
     /* ── reset ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      background-color: #000033;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect width='1' height='1' x='0' y='0' fill='%23000055'/%3E%3Crect width='1' height='1' x='4' y='4' fill='%23000055'/%3E%3C/svg%3E");
-      color: #00ff00;
-      font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
-      min-height: 100vh;
-      cursor: crosshair;
+    @font-face {
+      font-family: 'Chicago';
+      src: url("data:font/woff2;base64,") format('woff2');
     }
 
-    /* ── layout ── */
-    .page {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px 16px 40px;
+    body {
+      background-color: #c0c0c0;
+      /* classic Mac crosshatch dither pattern */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23c0c0c0'/%3E%3Crect width='1' height='1' x='0' y='0' fill='%23a0a0a0'/%3E%3Crect width='1' height='1' x='2' y='2' fill='%23a0a0a0'/%3E%3C/svg%3E");
+      color: #000;
+      font-family: 'Chicago', 'Geneva', 'Charcoal', 'Lucida Grande', 'Comic Sans MS', sans-serif;
+      min-height: 100vh;
+      cursor: default;
+      /* xerox grain overlay */
+      position: relative;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+      z-index: 9999;
+      mix-blend-mode: multiply;
+    }
+
+    /* ── Mac OS window chrome ── */
+    .window {
+      max-width: 780px;
+      margin: 24px auto;
+      border: 2px solid #000;
+      box-shadow: 4px 4px 0 #000;
+      background: #fff;
+    }
+
+    .title-bar {
+      background: #fff;
+      border-bottom: 2px solid #000;
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: grab;
+      /* classic Mac horizontal lines in title bar */
+      background-image:
+        repeating-linear-gradient(
+          transparent 0px, transparent 1px,
+          #000 1px, #000 2px,
+          transparent 2px, transparent 3px
+        );
+    }
+
+    .title-bar-text {
+      background: #fff;
+      padding: 0 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .close-box {
+      width: 14px;
+      height: 14px;
+      border: 2px solid #000;
+      background: #fff;
+      flex-shrink: 0;
+    }
+
+    .window-body {
+      padding: 16px 20px 24px;
     }
 
     /* ── header ── */
     header {
       text-align: center;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
     .header-stars {
-      color: #ffff00;
-      font-size: 1.2rem;
+      font-size: 0.8rem;
       letter-spacing: 4px;
+      color: #666;
     }
 
     header h1 {
-      font-size: clamp(2rem, 6vw, 3.2rem);
-      color: #ff00ff;
-      text-shadow:
-        2px 2px 0 #ff0000,
-        -1px -1px 0 #00ffff;
-      letter-spacing: 4px;
+      font-size: clamp(2rem, 6vw, 3rem);
+      color: #000;
+      text-transform: uppercase;
+      letter-spacing: 6px;
       margin: 8px 0;
+      font-weight: 900;
+      /* photocopied look */
+      text-shadow: 1px 0 0 rgba(0,0,0,0.3);
     }
 
     .subtitle {
-      color: #00ffff;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       margin: 4px 0;
+      color: #444;
+      font-style: italic;
     }
 
     .marquee-wrap {
       overflow: hidden;
-      margin: 12px 0;
+      margin: 10px 0;
+      border-top: 1px solid #000;
+      border-bottom: 1px solid #000;
+      padding: 4px 0;
+      background: #000;
     }
 
     .marquee-text {
       display: inline-block;
       white-space: nowrap;
-      animation: scroll-left 12s linear infinite;
-      color: #ffff00;
-      font-size: 0.85rem;
+      animation: scroll-left 14s linear infinite;
+      color: #fff;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
     }
 
     @keyframes scroll-left {
@@ -72,96 +138,118 @@
 
     .tag {
       display: inline-block;
-      margin-top: 8px;
-      font-size: 0.75rem;
-      border: 2px dashed #ff00ff;
-      color: #ff00ff;
-      padding: 4px 12px;
-      background: rgba(255, 0, 255, 0.1);
+      margin-top: 10px;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border: 2px solid #000;
+      color: #000;
+      padding: 3px 10px;
+      background: #fff;
     }
 
-    hr.rainbow {
+    hr.divider {
       border: none;
-      height: 4px;
-      background: linear-gradient(90deg, #ff0000, #ff7700, #ffff00, #00ff00, #0000ff, #8b00ff);
-      margin: 16px 0;
+      height: 2px;
+      background: #000;
+      margin: 14px 0;
+    }
+
+    /* dashed variation */
+    hr.dashed {
+      border: none;
+      height: 0;
+      border-top: 2px dashed #000;
+      margin: 14px 0;
     }
 
     /* ── hit counter ── */
     .hit-counter {
       text-align: center;
-      margin: 8px 0 16px;
-      font-size: 0.75rem;
-      color: #aaaaaa;
+      margin: 8px 0 14px;
+      font-size: 0.7rem;
+      color: #333;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .hit-counter .counter {
       display: inline-block;
       background: #000;
-      border: 2px inset #888;
+      border: 2px solid #000;
       padding: 2px 8px;
       font-family: 'Courier New', monospace;
-      color: #00ff00;
-      letter-spacing: 2px;
+      color: #0f0;
+      letter-spacing: 3px;
+      font-size: 0.8rem;
       margin-left: 4px;
     }
 
-    /* ── guestbook / nav ── */
+    /* ── nav ── */
     .nav-links {
       text-align: center;
-      margin-bottom: 20px;
-      font-size: 0.8rem;
+      margin-bottom: 16px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .nav-links a {
-      color: #00ffff;
+      color: #000;
       text-decoration: underline;
-      margin: 0 8px;
+      margin: 0 6px;
     }
 
     .nav-links a:hover {
-      color: #ffff00;
+      background: #000;
+      color: #fff;
+      text-decoration: none;
+      padding: 1px 3px;
     }
 
     /* ── gallery ── */
     .gallery {
       column-width: 200px;
       column-gap: 16px;
-      max-width: 800px;
+      max-width: 100%;
       margin: 0 auto;
     }
 
     /* ── card ── */
     .card {
-      background: #000066;
-      border: 3px outset #6666ff;
-      padding: 8px;
+      background: #fff;
+      border: 2px solid #000;
+      padding: 6px;
       margin-bottom: 16px;
       break-inside: avoid;
       display: inline-block;
       width: 100%;
       cursor: pointer;
-      transition: border-color 0.15s;
+      transition: box-shadow 0.1s, transform 0.1s;
+      /* slight xerox skew for grunge feel */
+      filter: contrast(1.05) brightness(0.98);
     }
 
     .card:hover {
-      border-color: #ff00ff;
-      background: #000088;
+      box-shadow: 3px 3px 0 #000;
+      transform: translate(-1px, -1px);
     }
 
-    .card:hover img {
-      filter: brightness(1.1) saturate(1.2);
+    .card:active {
+      box-shadow: 1px 1px 0 #000;
+      transform: translate(0, 0);
     }
 
     /* frame number */
     .frame-num {
-      font-size: 0.65rem;
-      color: #ffff00;
+      font-size: 0.6rem;
+      color: #000;
       font-weight: 700;
       letter-spacing: 2px;
       margin-bottom: 4px;
       display: block;
       font-family: 'Courier New', monospace;
+      text-transform: uppercase;
     }
 
     /* photo */
@@ -169,126 +257,163 @@
       display: block;
       width: 100%;
       height: auto;
-      border: 2px solid #00ff00;
-      image-rendering: auto;
+      border: 1px solid #000;
+      /* grainy b&w grunge filter */
+      filter: grayscale(100%) contrast(1.2);
+      transition: filter 0.3s;
+    }
+
+    .card:hover img {
+      /* reveal color on hover */
+      filter: grayscale(0%) contrast(1.05);
     }
 
     /* caption */
     .caption {
-      font-size: 0.7rem;
-      color: #00ffff;
-      margin-top: 6px;
+      font-size: 0.6rem;
+      color: #333;
+      margin-top: 5px;
       text-align: center;
       max-width: 100%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: 'Courier New', monospace;
     }
 
     /* ── empty state ── */
     .empty {
       text-align: center;
-      color: #ff00ff;
-      font-size: 1rem;
+      color: #000;
+      font-size: 0.9rem;
       padding: 60px 0;
       width: 100%;
+      text-transform: uppercase;
+      letter-spacing: 2px;
     }
 
     /* ── footer ── */
     footer {
       text-align: center;
-      margin-top: 32px;
-      font-size: 0.7rem;
-      color: #888;
+      margin-top: 20px;
+      font-size: 0.6rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     footer .best-viewed {
-      margin-top: 12px;
-      font-size: 0.65rem;
-      color: #666;
+      margin-top: 8px;
+      font-size: 0.55rem;
+      color: #999;
     }
 
     footer a {
-      color: #00ffff;
+      color: #000;
     }
 
     /* ── webring ── */
     .webring {
       text-align: center;
-      margin-top: 16px;
-      padding: 8px;
-      border: 1px dashed #444;
-      font-size: 0.7rem;
-      color: #aaa;
+      margin-top: 12px;
+      padding: 6px;
+      border: 1px dashed #666;
+      font-size: 0.6rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
     .webring a {
-      color: #ff00ff;
+      color: #000;
       text-decoration: underline;
-      margin: 0 6px;
+      margin: 0 4px;
     }
 
     /* ── under construction ── */
     .construction {
       text-align: center;
-      font-size: 0.75rem;
-      color: #ffff00;
-      margin-top: 12px;
-      animation: blink 1s step-end infinite;
+      font-size: 0.65rem;
+      color: #000;
+      margin-top: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      animation: blink 1.2s step-end infinite;
     }
 
     @keyframes blink {
       50% { opacity: 0; }
     }
 
+    /* ── scrollbar styling ── */
+    ::-webkit-scrollbar { width: 16px; }
+    ::-webkit-scrollbar-track { background: #c0c0c0; border-left: 1px solid #000; }
+    ::-webkit-scrollbar-thumb {
+      background: #fff;
+      border: 2px solid #000;
+    }
+
     /* ── mobile ── */
     @media (max-width: 520px) {
       .gallery { column-gap: 10px; }
-      header h1 { font-size: 2rem; }
+      header h1 { font-size: 2rem; letter-spacing: 3px; }
+      .window { margin: 8px; }
+      .window-body { padding: 12px; }
     }
   </style>
 </head>
 <body>
-<div class="page">
+<div class="window">
+  <div class="title-bar">
+    <div class="close-box"></div>
+    <span class="title-bar-text">tiny shots</span>
+  </div>
+  <div class="window-body">
 
-  <header>
-    <p class="header-stars">* ~ * ~ * ~ * ~ * ~ *</p>
-    <h1>TiNy ShOtS</h1>
-    <p class="subtitle">.:. photos best viewed small .:.</p>
-    <div class="marquee-wrap">
-      <span class="marquee-text">*** WeLcOmE tO mY pHoTo PaGe !!! uPdAtEd WeEkLy !!! pLeAsE sIgN mY gUeStBoOk *** WeLcOmE tO mY pHoTo PaGe !!! ***</span>
+    <header>
+      <p class="header-stars">* ~ * ~ * ~ * ~ * ~ *</p>
+      <h1>TiNy ShOtS</h1>
+      <p class="subtitle">photos best viewed small</p>
+      <div class="marquee-wrap">
+        <span class="marquee-text">&bull;&bull;&bull; welcome to my photo page &bull;&bull;&bull; updated weekly &bull;&bull;&bull; please sign the guestbook &bull;&bull;&bull; welcome to my photo page &bull;&bull;&bull;</span>
+      </div>
+      <span class="tag">Kodak Charmera &bull; 1.6MP &bull; 2026</span>
+    </header>
+
+    <hr class="divider">
+
+    <div class="hit-counter">
+      you are visitor no. <span class="counter" id="hitcount">000847</span>
     </div>
-    <span class="tag">Kodak Charmera &bull; 1.6MP &bull; 2026</span>
-  </header>
 
-  <hr class="rainbow">
+    <div class="nav-links">
+      [ <a href="#">home</a> |
+        <a href="#">guestbook</a> |
+        <a href="#">links</a> |
+        <a href="mailto:">email me</a> ]
+    </div>
 
-  <div class="hit-counter">
-    YoU aRe ViSiToR nUmBeR: <span class="counter" id="hitcount">000847</span>
-  </div>
+    <hr class="dashed">
 
-  <div class="nav-links">
-    [ <a href="#">HoMe</a> |
-      <a href="#">GuEsTbOoK</a> |
-      <a href="#">LiNkS</a> |
-      <a href="mailto:">EmAiL mE</a> ]
-  </div>
+    <div class="gallery" id="gallery"></div>
 
-  <div class="gallery" id="gallery"></div>
+    <hr class="divider">
 
-  <hr class="rainbow">
+    <div class="construction">** under construction **</div>
 
-  <div class="construction">** uNdEr CoNsTrUcTiOn **</div>
+    <footer>
+      shot on kodak charmera &bull; no zoom, no filter, no apologies
+      <p class="best-viewed">best viewed with netscape navigator 4.0 at 800x600</p>
+    </footer>
 
-  <footer>
-    sHoT oN kOdAk ChArMeRa &bull; nO zOoM, nO fIlTeR, nO aPoLoGiEs
-    <p class="best-viewed">BeSt ViEwEd WiTh NeTsCaPe NaViGaToR 4.0 aT 800x600</p>
-  </footer>
+    <div class="webring">
+      &laquo; <a href="#">prev</a> |
+      [ disposable camera web ring ] |
+      <a href="#">next</a> &raquo;
+    </div>
 
-  <div class="webring">
-    &laquo; <a href="#">PrEv</a> |
-    [ DiSpOsAbLe CaMeRa WeB rInG ] |
-    <a href="#">NeXt</a> &raquo;
   </div>
 </div>
 
@@ -306,7 +431,7 @@
     if (photos.length === 0) {
       const empty = document.createElement('p');
       empty.className = 'empty';
-      empty.textContent = '~*~ nO sHoTs YeT ~*~';
+      empty.textContent = '[ no shots yet ]';
       gallery.appendChild(empty);
       return;
     }
@@ -316,7 +441,7 @@
 
       const frameNum = document.createElement('span');
       frameNum.className = 'frame-num';
-      frameNum.textContent = '[ frame ' + pad(i + 1) + ' ]';
+      frameNum.textContent = 'frame ' + pad(i + 1);
       card.appendChild(frameNum);
 
       const img = document.createElement('img');
@@ -328,7 +453,7 @@
       if (photo.caption) {
         const cap = document.createElement('p');
         cap.className = 'caption';
-        cap.textContent = '~ ' + photo.caption + ' ~';
+        cap.textContent = photo.caption;
         card.appendChild(cap);
       }
 
