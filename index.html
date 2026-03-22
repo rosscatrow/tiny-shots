@@ -298,16 +298,22 @@
 
   let allPhotos = [];
   let allRolls = [];
-  let activeRoll = null; // null = show all
 
   function pad(n) { return String(n).padStart(2, '0'); }
 
+  function getActiveRoll() {
+    const hash = location.hash.slice(1);
+    return hash || null;
+  }
+
   function getFilteredPhotos() {
-    if (activeRoll === null) return allPhotos;
-    return allPhotos.filter(p => p.roll === activeRoll);
+    const active = getActiveRoll();
+    if (active === null) return allPhotos;
+    return allPhotos.filter(p => p.roll === active);
   }
 
   function renderRollNav() {
+    const activeRoll = getActiveRoll();
     rollNav.innerHTML = '';
     rollLabel.textContent = '';
     if (allRolls.length === 0) return;
@@ -316,9 +322,7 @@
     allTab.className = 'roll-tab' + (activeRoll === null ? ' active' : '');
     allTab.textContent = 'all';
     allTab.addEventListener('click', () => {
-      activeRoll = null;
-      renderRollNav();
-      renderGallery(getFilteredPhotos());
+      location.hash = '';
     });
     rollNav.appendChild(allTab);
 
@@ -328,9 +332,7 @@
       const datePart = roll.date ? ' \u00b7 ' + roll.date : '';
       tab.textContent = (roll.name || roll.id) + datePart;
       tab.addEventListener('click', () => {
-        activeRoll = roll.id;
-        renderRollNav();
-        renderGallery(getFilteredPhotos());
+        location.hash = roll.id;
       });
       rollNav.appendChild(tab);
     });
@@ -380,6 +382,11 @@
       gallery.appendChild(card);
     });
   }
+
+  window.addEventListener('hashchange', () => {
+    renderRollNav();
+    renderGallery(getFilteredPhotos());
+  });
 
   Promise.all([
     fetch('photos.json?v=' + Date.now()).then(r => r.json()).catch(() => []),
