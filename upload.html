@@ -107,6 +107,70 @@
       margin-top: 4px;
     }
 
+    /* ── roll section ── */
+    .roll-section {
+      margin-bottom: 32px;
+    }
+
+    .roll-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 8px 0;
+    }
+
+    .roll-chip {
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      padding: 5px 12px;
+      border: 1px solid var(--ink-faint);
+      background: #fff;
+      cursor: pointer;
+      color: var(--ink);
+      border-radius: 2px;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .roll-chip.selected {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
+    }
+
+    .roll-chip.new-roll-chip {
+      border-style: dashed;
+      opacity: 0.65;
+    }
+
+    .roll-chip.new-roll-chip:hover {
+      opacity: 1;
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .new-roll-form {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .new-roll-form input[type="text"] {
+      flex: 1;
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.85rem;
+      padding: 8px 10px;
+      border: 1px solid var(--ink-faint);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 2px;
+    }
+
+    .new-roll-form input[type="text"]:focus {
+      outline: 2px solid var(--red);
+      outline-offset: 1px;
+    }
+
     /* ── upload area ── */
     .upload-area {
       border: 2px dashed var(--ink-faint);
@@ -260,6 +324,19 @@
     <p class="hint">needs repo contents write access &mdash; saved in your browser only</p>
   </div>
 
+  <!-- roll selection -->
+  <div class="roll-section">
+    <label>Roll</label>
+    <div class="roll-chips" id="rollChips">
+      <button class="roll-chip new-roll-chip" id="newRollChip" type="button">+ new roll</button>
+    </div>
+    <div class="new-roll-form" id="newRollForm" style="display:none">
+      <input type="text" id="rollName" placeholder="roll name">
+      <input type="text" id="rollDate" placeholder="YYYY-MM" style="max-width:110px">
+    </div>
+    <p class="hint">photos will be grouped under this roll</p>
+  </div>
+
   <!-- file picker -->
   <div class="upload-area" id="dropzone">
     <div class="icon">+</div>
@@ -291,14 +368,60 @@
   const previews = document.getElementById('previews');
   const uploadBtn = document.getElementById('uploadBtn');
   const log = document.getElementById('log');
+  const rollChips = document.getElementById('rollChips');
+  const newRollChip = document.getElementById('newRollChip');
+  const newRollForm = document.getElementById('newRollForm');
+  const rollNameInput = document.getElementById('rollName');
+  const rollDateInput = document.getElementById('rollDate');
 
   let selectedFiles = []; // { file, caption, dataUrl }
+  let rolls = [];         // loaded from rolls.json
+  let selectedRollId = null;  // id of existing roll, or 'new' for a new roll
 
   // ── persist token in localStorage ──
   tokenInput.value = localStorage.getItem('ts_token') || '';
   tokenInput.addEventListener('input', () => {
     localStorage.setItem('ts_token', tokenInput.value.trim());
   });
+
+  // ── load rolls from public endpoint ──
+  fetch('rolls.json?v=' + Date.now())
+    .then(r => r.json())
+    .catch(() => [])
+    .then(data => { rolls = data; renderRollChips(); });
+
+  // ── roll selection ──
+  function renderRollChips() {
+    rollChips.innerHTML = '';
+
+    rolls.forEach(roll => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'roll-chip' + (selectedRollId === roll.id ? ' selected' : '');
+      const datePart = roll.date ? ' \u00b7 ' + roll.date : '';
+      chip.textContent = (roll.name || roll.id) + datePart;
+      chip.addEventListener('click', () => {
+        selectedRollId = roll.id;
+        newRollForm.style.display = 'none';
+        renderRollChips();
+      });
+      rollChips.appendChild(chip);
+    });
+
+    const newChip = document.createElement('button');
+    newChip.type = 'button';
+    newChip.className = 'roll-chip new-roll-chip' + (selectedRollId === 'new' ? ' selected' : '');
+    newChip.textContent = '+ new roll';
+    newChip.addEventListener('click', () => {
+      selectedRollId = 'new';
+      newRollForm.style.display = 'flex';
+      rollNameInput.focus();
+      renderRollChips();
+    });
+    rollChips.appendChild(newChip);
+  }
+
+  renderRollChips();
 
   // ── file picking ──
   dropzone.addEventListener('click', () => picker.click());
@@ -356,6 +479,11 @@
     const token = tokenInput.value.trim();
     if (!token) { appendLog('set a github token first', 'err'); return; }
     if (selectedFiles.length === 0) return;
+    if (!selectedRollId) { appendLog('select or create a roll first', 'err'); return; }
+    if (selectedRollId === 'new') {
+      const name = rollNameInput.value.trim();
+      if (!name) { appendLog('enter a name for the new roll', 'err'); return; }
+    }
 
     uploadBtn.disabled = true;
     const headers = {
@@ -364,6 +492,48 @@
     };
 
     try {
+      // ── resolve roll id ──
+      let rollId = selectedRollId;
+      let updatedRolls = null;
+
+      if (selectedRollId === 'new') {
+        const name = rollNameInput.value.trim();
+        const date = rollDateInput.value.trim();
+        rollId = 'roll-' + Date.now();
+
+        // fetch current rolls.json (may not exist yet)
+        appendLog('reading rolls.json...');
+        const rollsRes = await fetch(`${API}/repos/${REPO}/contents/rolls.json?ref=${BRANCH}`, { headers });
+        let existingRolls = [];
+        let rollsSha = null;
+        if (rollsRes.ok) {
+          const rollsData = await rollsRes.json();
+          existingRolls = JSON.parse(atob(rollsData.content.replace(/\n/g, '')));
+          rollsSha = rollsData.sha;
+        }
+
+        const newRoll = { id: rollId, name };
+        if (date) newRoll.date = date;
+        updatedRolls = [...existingRolls, newRoll];
+
+        // write rolls.json
+        appendLog('creating roll "' + name + '"...');
+        const rollsBody = {
+          message: `Add roll: ${name}`,
+          content: btoa(JSON.stringify(updatedRolls, null, 2) + '\n'),
+          branch: BRANCH,
+        };
+        if (rollsSha) rollsBody.sha = rollsSha;
+
+        const rollsPutRes = await fetch(`${API}/repos/${REPO}/contents/rolls.json`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify(rollsBody),
+        });
+        if (!rollsPutRes.ok) throw new Error('failed to save rolls.json — ' + rollsPutRes.status);
+        appendLog('roll created', 'ok');
+      }
+
       // 1. fetch current photos.json
       appendLog('reading photos.json...');
       const manifestRes = await fetch(`${API}/repos/${REPO}/contents/photos.json?ref=${BRANCH}`, { headers });
@@ -414,7 +584,7 @@
 
         // add to manifest if not already there
         if (!manifest.some(p => p.file === filename)) {
-          const entry = { file: filename };
+          const entry = { file: filename, roll: rollId };
           if (item.caption.trim()) entry.caption = item.caption.trim();
           manifest.push(entry);
         }
@@ -442,6 +612,14 @@
       if (!updateManifest.ok) throw new Error('failed to update photos.json');
       appendLog('photos.json updated', 'ok');
       appendLog('done! gallery will update shortly.', 'ok');
+
+      // update local rolls list if new roll was created
+      if (updatedRolls) {
+        rolls = updatedRolls;
+        selectedRollId = rollId;
+        newRollForm.style.display = 'none';
+        renderRollChips();
+      }
 
       // clear selection
       selectedFiles = [];

@@ -185,6 +185,45 @@
       font-family: 'Courier New', monospace;
     }
 
+    /* ── roll nav ── */
+    .roll-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .roll-tab {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border: 2px solid #000;
+      background: #fff;
+      cursor: pointer;
+      color: #000;
+      text-transform: lowercase;
+    }
+
+    .roll-tab.active {
+      background: #000;
+      color: #fff;
+    }
+
+    .roll-tab:hover:not(.active) {
+      background: #eee;
+    }
+
+    .roll-label {
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      color: #555;
+      text-align: center;
+      margin-bottom: 10px;
+      text-transform: lowercase;
+    }
+
     /* ── empty state ── */
     .empty {
       text-align: center;
@@ -238,6 +277,9 @@
 
     <hr class="dashed">
 
+    <div class="roll-nav" id="rollNav"></div>
+    <div class="roll-label" id="rollLabel"></div>
+
     <div class="gallery" id="gallery"></div>
 
     <hr class="divider">
@@ -251,15 +293,63 @@
 
 <script>
   const gallery = document.getElementById('gallery');
+  const rollNav = document.getElementById('rollNav');
+  const rollLabel = document.getElementById('rollLabel');
+
+  let allPhotos = [];
+  let allRolls = [];
+  let activeRoll = null; // null = show all
 
   function pad(n) { return String(n).padStart(2, '0'); }
+
+  function getFilteredPhotos() {
+    if (activeRoll === null) return allPhotos;
+    return allPhotos.filter(p => p.roll === activeRoll);
+  }
+
+  function renderRollNav() {
+    rollNav.innerHTML = '';
+    rollLabel.textContent = '';
+    if (allRolls.length === 0) return;
+
+    const allTab = document.createElement('button');
+    allTab.className = 'roll-tab' + (activeRoll === null ? ' active' : '');
+    allTab.textContent = 'all';
+    allTab.addEventListener('click', () => {
+      activeRoll = null;
+      renderRollNav();
+      renderGallery(getFilteredPhotos());
+    });
+    rollNav.appendChild(allTab);
+
+    allRolls.forEach(roll => {
+      const tab = document.createElement('button');
+      tab.className = 'roll-tab' + (activeRoll === roll.id ? ' active' : '');
+      const datePart = roll.date ? ' \u00b7 ' + roll.date : '';
+      tab.textContent = (roll.name || roll.id) + datePart;
+      tab.addEventListener('click', () => {
+        activeRoll = roll.id;
+        renderRollNav();
+        renderGallery(getFilteredPhotos());
+      });
+      rollNav.appendChild(tab);
+    });
+
+    if (activeRoll !== null) {
+      const roll = allRolls.find(r => r.id === activeRoll);
+      if (roll) {
+        const count = allPhotos.filter(p => p.roll === activeRoll).length;
+        rollLabel.textContent = `${count} shot${count !== 1 ? 's' : ''}`;
+      }
+    }
+  }
 
   function renderGallery(photos) {
     gallery.innerHTML = '';
     if (photos.length === 0) {
       const empty = document.createElement('p');
       empty.className = 'empty';
-      empty.textContent = '[ no shots yet ]';
+      empty.textContent = activeRoll !== null ? '[ no shots on this roll ]' : '[ no shots yet ]';
       gallery.appendChild(empty);
       return;
     }
@@ -291,10 +381,15 @@
     });
   }
 
-  fetch('photos.json?v=' + Date.now())
-    .then(r => r.json())
-    .then(renderGallery)
-    .catch(() => renderGallery([]));
+  Promise.all([
+    fetch('photos.json?v=' + Date.now()).then(r => r.json()).catch(() => []),
+    fetch('rolls.json?v=' + Date.now()).then(r => r.json()).catch(() => [])
+  ]).then(([photos, rolls]) => {
+    allPhotos = photos;
+    allRolls = rolls;
+    renderRollNav();
+    renderGallery(getFilteredPhotos());
+  });
 </script>
 </body>
 </html>
