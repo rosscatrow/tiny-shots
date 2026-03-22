@@ -238,7 +238,8 @@
       flex-shrink: 0;
     }
 
-    .btn-delete {
+    .btn-delete,
+    .btn-gen {
       font-family: 'Courier New', monospace;
       font-size: 0.65rem;
       padding: 4px 8px;
@@ -252,6 +253,8 @@
     }
 
     .btn-delete:hover { background: #000; color: #fff; }
+    .btn-gen:hover:not(:disabled) { background: #000; color: #fff; }
+    .btn-gen:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .card.deleted .btn-delete {
       background: #fff;
@@ -378,6 +381,12 @@
       <p class="hint">needs repo contents write access &mdash; saved in your browser only</p>
     </div>
 
+    <div class="setup">
+      <label for="anthropicKey">Anthropic API Key</label>
+      <input type="password" id="anthropicKey" placeholder="sk-ant-...">
+      <p class="hint">used to auto-generate titles &mdash; saved in your browser only</p>
+    </div>
+
     <hr class="dashed">
 
     <div class="roll-nav" id="rollNav"></div>
@@ -404,6 +413,7 @@
   const API = 'https://api.github.com';
 
   const tokenInput = document.getElementById('token');
+  const anthropicInput = document.getElementById('anthropicKey');
   const rollNav = document.getElementById('rollNav');
   const grid = document.getElementById('grid');
   const saveBtn = document.getElementById('saveBtn');
@@ -420,6 +430,11 @@
   tokenInput.value = localStorage.getItem('ts_token') || '';
   tokenInput.addEventListener('input', () => {
     localStorage.setItem('ts_token', tokenInput.value.trim());
+  });
+
+  anthropicInput.value = localStorage.getItem('ts_anthropic_key') || '';
+  anthropicInput.addEventListener('input', () => {
+    localStorage.setItem('ts_anthropic_key', anthropicInput.value.trim());
   });
 
   // ── load data ──
@@ -558,6 +573,25 @@
       // actions
       const actions = document.createElement('div');
       actions.className = 'card-actions';
+
+      const genBtn = document.createElement('button');
+      genBtn.className = 'btn-gen';
+      genBtn.textContent = 'gen title';
+      genBtn.disabled = isDeleted;
+      genBtn.addEventListener('click', async () => {
+        const key = anthropicInput.value.trim();
+        if (!key) { appendLog('set an anthropic key first', 'err'); return; }
+        genBtn.disabled = true;
+        genBtn.textContent = '...';
+        const title = await generateTitle(`photos/${photo.file}`, key);
+        if (title) {
+          titleInput.value = title;
+          setEdit(i, 'title', title);
+        }
+        genBtn.textContent = 'gen title';
+        genBtn.disabled = false;
+      });
+      actions.appendChild(genBtn);
 
       const delBtn = document.createElement('button');
       delBtn.className = 'btn-delete';
@@ -707,6 +741,47 @@
     } catch (err) {
       appendLog(err.message, 'err');
       saveBtn.disabled = false;
+    }
+  }
+
+  async function generateTitle(imgPath, key) {
+    try {
+      const res = await fetch(imgPath);
+      const blob = await res.blob();
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+      const base64 = dataUrl.split(',')[1];
+      const mimeType = dataUrl.split(';')[0].split(':')[1];
+
+      const apiRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 24,
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64 } },
+              { type: 'text', text: 'Give this photo a short weird title. Rules: start with one emoji, then 1–3 more words, be evocative and strange not descriptive. Reply with the title only. Examples: "🪸 haunted by the light" · "🧲 something remembered wrongly" · "🫧 almost a tuesday" · "🕳️ fell into it sideways"' },
+            ],
+          }],
+        }),
+      });
+      if (!apiRes.ok) return null;
+      const data = await apiRes.json();
+      return data.content?.[0]?.text?.trim() || null;
+    } catch (_) {
+      return null;
     }
   }
 
