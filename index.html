@@ -3,142 +3,165 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>tiny shots</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <title>~*~ TiNy ShOtS ~*~</title>
   <style>
     /* ── reset ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── base ── */
-    :root {
-      --paper: #f0ead6;
-      --ink: #2a2016;
-      --ink-faint: rgba(42, 32, 22, 0.12);
-      --red: #d94f30;
-      --grid: 28px;
-    }
-
     body {
-      background-color: var(--paper);
-      color: var(--ink);
-      font-family: 'Courier Prime', 'Courier New', monospace;
+      background-color: #000033;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect width='1' height='1' x='0' y='0' fill='%23000055'/%3E%3Crect width='1' height='1' x='4' y='4' fill='%23000055'/%3E%3C/svg%3E");
+      color: #00ff00;
+      font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
       min-height: 100vh;
-      /* grain texture via SVG data URI */
-      background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      background-repeat: repeat;
-    }
-
-    /* graph-paper grid overlay */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background-image:
-        linear-gradient(var(--ink-faint) 1px, transparent 1px),
-        linear-gradient(90deg, var(--ink-faint) 1px, transparent 1px);
-      background-size: var(--grid) var(--grid);
-      z-index: 0;
+      cursor: crosshair;
     }
 
     /* ── layout ── */
     .page {
-      position: relative;
-      z-index: 1;
-      max-width: 960px;
+      max-width: 800px;
       margin: 0 auto;
-      padding: 48px 24px 64px;
+      padding: 20px 16px 40px;
     }
 
     /* ── header ── */
     header {
       text-align: center;
-      margin-bottom: 52px;
+      margin-bottom: 12px;
+    }
+
+    .header-stars {
+      color: #ffff00;
+      font-size: 1.2rem;
+      letter-spacing: 4px;
     }
 
     header h1 {
-      font-family: 'Instrument Serif', Georgia, serif;
-      font-style: italic;
-      font-size: clamp(2.4rem, 6vw, 4rem);
-      font-weight: 400;
-      letter-spacing: -0.02em;
-      line-height: 1;
-      color: var(--ink);
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      color: #ff00ff;
+      text-shadow:
+        2px 2px 0 #ff0000,
+        -1px -1px 0 #00ffff;
+      letter-spacing: 4px;
+      margin: 8px 0;
     }
 
-    header .subtitle {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      margin-top: 10px;
-      opacity: 0.55;
+    .subtitle {
+      color: #00ffff;
+      font-size: 0.9rem;
+      margin: 4px 0;
     }
 
-    header .tag {
+    .marquee-wrap {
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    .marquee-text {
       display: inline-block;
-      margin-top: 14px;
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      border: 1px solid var(--red);
-      color: var(--red);
-      padding: 3px 8px;
-      border-radius: 2px;
+      white-space: nowrap;
+      animation: scroll-left 12s linear infinite;
+      color: #ffff00;
+      font-size: 0.85rem;
+    }
+
+    @keyframes scroll-left {
+      0%   { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    .tag {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      border: 2px dashed #ff00ff;
+      color: #ff00ff;
+      padding: 4px 12px;
+      background: rgba(255, 0, 255, 0.1);
+    }
+
+    hr.rainbow {
+      border: none;
+      height: 4px;
+      background: linear-gradient(90deg, #ff0000, #ff7700, #ffff00, #00ff00, #0000ff, #8b00ff);
+      margin: 16px 0;
+    }
+
+    /* ── hit counter ── */
+    .hit-counter {
+      text-align: center;
+      margin: 8px 0 16px;
+      font-size: 0.75rem;
+      color: #aaaaaa;
+    }
+
+    .hit-counter .counter {
+      display: inline-block;
+      background: #000;
+      border: 2px inset #888;
+      padding: 2px 8px;
+      font-family: 'Courier New', monospace;
+      color: #00ff00;
+      letter-spacing: 2px;
+      margin-left: 4px;
+    }
+
+    /* ── guestbook / nav ── */
+    .nav-links {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 0.8rem;
+    }
+
+    .nav-links a {
+      color: #00ffff;
+      text-decoration: underline;
+      margin: 0 8px;
+    }
+
+    .nav-links a:hover {
+      color: #ffff00;
     }
 
     /* ── gallery ── */
     .gallery {
-      column-width: 180px;
-      column-gap: 28px;
-      max-width: 960px;
+      column-width: 200px;
+      column-gap: 16px;
+      max-width: 800px;
       margin: 0 auto;
     }
 
     /* ── card ── */
     .card {
-      background: #fff;
-      padding: 10px 10px 22px;
-      box-shadow: 2px 3px 12px rgba(42, 32, 22, 0.18), 0 1px 3px rgba(42, 32, 22, 0.10);
-      cursor: default;
-      /* rotation is set inline via JS */
-      transform-origin: center center;
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
-      opacity: 0;
-      translate: 0 14px;
+      background: #000066;
+      border: 3px outset #6666ff;
+      padding: 8px;
+      margin-bottom: 16px;
       break-inside: avoid;
-      margin-bottom: 28px;
       display: inline-block;
       width: 100%;
-    }
-
-    .card.visible {
-      opacity: 1;
-      translate: 0 0;
-      transition:
-        opacity 0.4s ease,
-        translate 0.4s ease,
-        transform 0.18s ease,
-        box-shadow 0.18s ease;
+      cursor: pointer;
+      transition: border-color 0.15s;
     }
 
     .card:hover {
-      transform: rotate(0deg) scale(1.06) !important;
-      box-shadow: 4px 8px 24px rgba(42, 32, 22, 0.28);
-      z-index: 10;
-      position: relative;
+      border-color: #ff00ff;
+      background: #000088;
+    }
+
+    .card:hover img {
+      filter: brightness(1.1) saturate(1.2);
     }
 
     /* frame number */
     .frame-num {
-      font-size: 0.6rem;
-      color: var(--red);
+      font-size: 0.65rem;
+      color: #ffff00;
       font-weight: 700;
-      letter-spacing: 0.08em;
-      margin-bottom: 5px;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
       display: block;
+      font-family: 'Courier New', monospace;
     }
 
     /* photo */
@@ -146,16 +169,15 @@
       display: block;
       width: 100%;
       height: auto;
-      background: #ddd;
+      border: 2px solid #00ff00;
+      image-rendering: auto;
     }
 
     /* caption */
     .caption {
-      font-size: 0.55rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-top: 8px;
-      opacity: 0.5;
+      font-size: 0.7rem;
+      color: #00ffff;
+      margin-top: 6px;
       text-align: center;
       max-width: 100%;
       white-space: nowrap;
@@ -166,10 +188,8 @@
     /* ── empty state ── */
     .empty {
       text-align: center;
-      opacity: 0.4;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
+      color: #ff00ff;
+      font-size: 1rem;
       padding: 60px 0;
       width: 100%;
     }
@@ -177,17 +197,54 @@
     /* ── footer ── */
     footer {
       text-align: center;
-      margin-top: 64px;
+      margin-top: 32px;
+      font-size: 0.7rem;
+      color: #888;
+    }
+
+    footer .best-viewed {
+      margin-top: 12px;
       font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      opacity: 0.38;
+      color: #666;
+    }
+
+    footer a {
+      color: #00ffff;
+    }
+
+    /* ── webring ── */
+    .webring {
+      text-align: center;
+      margin-top: 16px;
+      padding: 8px;
+      border: 1px dashed #444;
+      font-size: 0.7rem;
+      color: #aaa;
+    }
+
+    .webring a {
+      color: #ff00ff;
+      text-decoration: underline;
+      margin: 0 6px;
+    }
+
+    /* ── under construction ── */
+    .construction {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #ffff00;
+      margin-top: 12px;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
     }
 
     /* ── mobile ── */
     @media (max-width: 520px) {
-      .gallery { column-gap: 18px; }
-      header h1 { font-size: 2.4rem; }
+      .gallery { column-gap: 10px; }
+      header h1 { font-size: 2rem; }
     }
   </style>
 </head>
@@ -195,14 +252,44 @@
 <div class="page">
 
   <header>
-    <h1>tiny shots</h1>
-    <p class="subtitle">photos best viewed small</p>
+    <p class="header-stars">* ~ * ~ * ~ * ~ * ~ *</p>
+    <h1>TiNy ShOtS</h1>
+    <p class="subtitle">.:. photos best viewed small .:.</p>
+    <div class="marquee-wrap">
+      <span class="marquee-text">*** WeLcOmE tO mY pHoTo PaGe !!! uPdAtEd WeEkLy !!! pLeAsE sIgN mY gUeStBoOk *** WeLcOmE tO mY pHoTo PaGe !!! ***</span>
+    </div>
     <span class="tag">Kodak Charmera &bull; 1.6MP &bull; 2026</span>
   </header>
 
+  <hr class="rainbow">
+
+  <div class="hit-counter">
+    YoU aRe ViSiToR nUmBeR: <span class="counter" id="hitcount">000847</span>
+  </div>
+
+  <div class="nav-links">
+    [ <a href="#">HoMe</a> |
+      <a href="#">GuEsTbOoK</a> |
+      <a href="#">LiNkS</a> |
+      <a href="mailto:">EmAiL mE</a> ]
+  </div>
+
   <div class="gallery" id="gallery"></div>
 
-  <footer>shot on kodak charmera &bull; no zoom, no filter, no apologies</footer>
+  <hr class="rainbow">
+
+  <div class="construction">** uNdEr CoNsTrUcTiOn **</div>
+
+  <footer>
+    sHoT oN kOdAk ChArMeRa &bull; nO zOoM, nO fIlTeR, nO aPoLoGiEs
+    <p class="best-viewed">BeSt ViEwEd WiTh NeTsCaPe NaViGaToR 4.0 aT 800x600</p>
+  </footer>
+
+  <div class="webring">
+    &laquo; <a href="#">PrEv</a> |
+    [ DiSpOsAbLe CaMeRa WeB rInG ] |
+    <a href="#">NeXt</a> &raquo;
+  </div>
 </div>
 
 <script>
@@ -210,31 +297,26 @@
 
   function pad(n) { return String(n).padStart(2, '0'); }
 
-  function randomRot(i) {
-    const mag = 1 + Math.random() * 3;
-    const sign = (i % 2 === 0) ? 1 : -1;
-    return (sign * mag).toFixed(2);
-  }
+  // bump fake hit counter
+  const hc = document.getElementById('hitcount');
+  hc.textContent = String(847 + Math.floor(Math.random() * 20)).padStart(6, '0');
 
   function renderGallery(photos) {
     gallery.innerHTML = '';
     if (photos.length === 0) {
       const empty = document.createElement('p');
       empty.className = 'empty';
-      empty.textContent = 'no shots yet';
+      empty.textContent = '~*~ nO sHoTs YeT ~*~';
       gallery.appendChild(empty);
       return;
     }
     photos.forEach((photo, i) => {
-      const rot = randomRot(i);
-
       const card = document.createElement('div');
       card.className = 'card';
-      card.style.transform = `rotate(${rot}deg)`;
 
       const frameNum = document.createElement('span');
       frameNum.className = 'frame-num';
-      frameNum.textContent = pad(i + 1);
+      frameNum.textContent = '[ frame ' + pad(i + 1) + ' ]';
       card.appendChild(frameNum);
 
       const img = document.createElement('img');
@@ -246,12 +328,11 @@
       if (photo.caption) {
         const cap = document.createElement('p');
         cap.className = 'caption';
-        cap.textContent = photo.caption;
+        cap.textContent = '~ ' + photo.caption + ' ~';
         card.appendChild(cap);
       }
 
       gallery.appendChild(card);
-      setTimeout(() => card.classList.add('visible'), 80 + i * 60);
     });
   }
 
