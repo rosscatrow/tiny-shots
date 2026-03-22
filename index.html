@@ -164,6 +164,15 @@
       font-family: 'Courier New', monospace;
     }
 
+    /* title */
+    .card-title {
+      font-size: 0.75rem;
+      color: #000;
+      font-weight: 700;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
     /* photo */
     .card img {
       display: block;
@@ -272,6 +281,13 @@
       frameNum.className = 'frame-num';
       frameNum.textContent = 'frame ' + pad(i + 1);
       card.appendChild(frameNum);
+
+      if (photo.title) {
+        const title = document.createElement('p');
+        title.className = 'card-title';
+        title.textContent = photo.title;
+        card.appendChild(title);
+      }
 
       const img = document.createElement('img');
       img.src = `photos/${photo.file}`;
