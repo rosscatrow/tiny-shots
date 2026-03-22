@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>manage — tiny shots</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: #c0c0c0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23c0c0c0'/%3E%3Crect width='1' height='1' x='0' y='0' fill='%23a0a0a0'/%3E%3Crect width='1' height='1' x='2' y='2' fill='%23a0a0a0'/%3E%3C/svg%3E");
+      color: #000;
+      font-family: 'Chicago', 'Geneva', 'Charcoal', 'Lucida Grande', sans-serif;
+      min-height: 100vh;
+      cursor: default;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+      z-index: 9999;
+      mix-blend-mode: multiply;
+    }
+
+    /* ── window chrome ── */
+    .window {
+      max-width: 700px;
+      margin: 24px auto;
+      border: 2px solid #000;
+      box-shadow: 4px 4px 0 #000;
+      background: #fff;
+    }
+
+    .title-bar {
+      background: #fff;
+      border-bottom: 2px solid #000;
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: grab;
+      background-image:
+        repeating-linear-gradient(
+          transparent 0px, transparent 1px,
+          #000 1px, #000 2px,
+          transparent 2px, transparent 3px
+        );
+    }
+
+    .title-bar-text {
+      background: #fff;
+      padding: 0 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .close-box {
+      width: 14px;
+      height: 14px;
+      border: 2px solid #000;
+      background: #fff;
+      flex-shrink: 0;
+    }
+
+    .window-body {
+      padding: 20px 24px 28px;
+    }
+
+    /* ── header ── */
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      letter-spacing: 6px;
+      font-weight: 900;
+      text-transform: lowercase;
+      color: #000;
+    }
+
+    header .subtitle {
+      font-size: 0.7rem;
+      color: #444;
+      font-style: italic;
+      margin-top: 4px;
+      font-family: 'Courier New', monospace;
+    }
+
+    hr.divider { border: none; height: 2px; background: #000; margin: 14px 0; }
+    hr.dashed  { border: none; height: 0; border-top: 2px dashed #000; margin: 14px 0; }
+
+    /* ── token ── */
+    .setup { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+      color: #555;
+      font-family: 'Courier New', monospace;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      padding: 6px 8px;
+      border: 2px solid #000;
+      background: #fff;
+      color: #000;
+      outline: none;
+    }
+
+    input[type="password"]:focus { background: #f0f0f0; }
+
+    .hint {
+      font-size: 0.6rem;
+      color: #666;
+      margin-top: 4px;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* ── roll nav ── */
+    .roll-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .roll-tab {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border: 2px solid #000;
+      background: #fff;
+      cursor: pointer;
+      color: #000;
+      text-transform: lowercase;
+    }
+
+    .roll-tab.active { background: #000; color: #fff; }
+    .roll-tab:hover:not(.active) { background: #eee; }
+
+    /* ── photo grid ── */
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ── photo card ── */
+    .card {
+      border: 2px solid #000;
+      display: flex;
+      gap: 12px;
+      padding: 10px;
+      background: #fff;
+      position: relative;
+    }
+
+    .card.deleted {
+      opacity: 0.35;
+      background: #eee;
+    }
+
+    .card.modified {
+      border-left: 4px solid #000;
+    }
+
+    .card-thumb {
+      flex-shrink: 0;
+      width: 100px;
+    }
+
+    .card-thumb img {
+      display: block;
+      width: 100px;
+      height: 75px;
+      object-fit: cover;
+      border: 1px solid #000;
+    }
+
+    .card-fields {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .card-fields input[type="text"],
+    .card-fields select {
+      width: 100%;
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      padding: 4px 6px;
+      border: 1px solid #000;
+      background: #fff;
+      color: #000;
+      outline: none;
+    }
+
+    .card-fields input[type="text"]:focus,
+    .card-fields select:focus {
+      background: #f0f0f0;
+    }
+
+    .card-fields select {
+      cursor: pointer;
+    }
+
+    .field-label {
+      font-size: 0.55rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #888;
+      font-family: 'Courier New', monospace;
+      margin-bottom: 1px;
+    }
+
+    .card-actions {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .btn-delete {
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      padding: 4px 8px;
+      border: 2px solid #000;
+      background: #fff;
+      color: #000;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: lowercase;
+      white-space: nowrap;
+    }
+
+    .btn-delete:hover { background: #000; color: #fff; }
+
+    .card.deleted .btn-delete {
+      background: #fff;
+      color: #000;
+    }
+
+    /* ── empty state ── */
+    .empty {
+      text-align: center;
+      color: #000;
+      font-size: 0.9rem;
+      padding: 40px 0;
+      letter-spacing: 2px;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* ── save bar ── */
+    .save-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      font-family: 'Chicago', 'Geneva', 'Charcoal', 'Lucida Grande', sans-serif;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      padding: 10px 20px;
+      border: 2px solid #000;
+      background: #fff;
+      color: #000;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #000;
+      transition: box-shadow 0.1s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    .btn:hover:not(:disabled) {
+      box-shadow: 1px 1px 0 #000;
+      transform: translate(2px, 2px);
+    }
+
+    .btn:active:not(:disabled) {
+      box-shadow: none;
+      transform: translate(3px, 3px);
+    }
+
+    .btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .change-count {
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      color: #555;
+      letter-spacing: 1px;
+    }
+
+    /* ── log ── */
+    .log {
+      margin-top: 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      line-height: 1.8;
+      max-height: 120px;
+      overflow-y: auto;
+      color: #333;
+    }
+
+    .log .ok  { color: #000; font-weight: bold; }
+    .log .err { color: #000; text-decoration: underline; }
+
+    /* ── footer ── */
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #555;
+      font-family: 'Courier New', monospace;
+      text-decoration: none;
+    }
+
+    .back:hover { color: #000; }
+
+    /* ── scrollbar ── */
+    ::-webkit-scrollbar { width: 16px; }
+    ::-webkit-scrollbar-track { background: #c0c0c0; border-left: 1px solid #000; }
+    ::-webkit-scrollbar-thumb { background: #fff; border: 2px solid #000; }
+
+    @media (max-width: 520px) {
+      .window { margin: 8px; }
+      .window-body { padding: 14px; }
+      .card { flex-wrap: wrap; }
+      .card-thumb { width: 80px; }
+      .card-thumb img { width: 80px; height: 60px; }
+    }
+  </style>
+</head>
+<body>
+<div class="window">
+  <div class="title-bar">
+    <div class="close-box"></div>
+    <span class="title-bar-text">manage — tiny shots</span>
+  </div>
+  <div class="window-body">
+
+    <header>
+      <h1>manage</h1>
+      <p class="subtitle">edit captions, rolls, and delete photos</p>
+    </header>
+
+    <hr class="dashed">
+
+    <div class="setup">
+      <label for="token">GitHub Token</label>
+      <input type="password" id="token" placeholder="ghp_... or github_pat_...">
+      <p class="hint">needs repo contents write access &mdash; saved in your browser only</p>
+    </div>
+
+    <hr class="dashed">
+
+    <div class="roll-nav" id="rollNav"></div>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="save-bar">
+      <button class="btn" id="saveBtn" disabled>Save Changes</button>
+      <span class="change-count" id="changeCount"></span>
+    </div>
+
+    <div class="log" id="log"></div>
+
+    <hr class="divider">
+
+    <a class="back" href="/">&#8592; back to gallery</a>
+
+  </div>
+</div>
+
+<script>
+  const REPO = 'rosscatrow/tiny-shots';
+  const BRANCH = 'main';
+  const API = 'https://api.github.com';
+
+  const tokenInput = document.getElementById('token');
+  const rollNav = document.getElementById('rollNav');
+  const grid = document.getElementById('grid');
+  const saveBtn = document.getElementById('saveBtn');
+  const changeCount = document.getElementById('changeCount');
+  const log = document.getElementById('log');
+
+  let allPhotos = [];   // original data from photos.json
+  let allRolls = [];
+  let edits = {};       // { index: { title, caption, roll } } — pending field edits
+  let deletions = new Set(); // indices marked for deletion
+  let activeRoll = null;
+
+  // ── token ──
+  tokenInput.value = localStorage.getItem('ts_token') || '';
+  tokenInput.addEventListener('input', () => {
+    localStorage.setItem('ts_token', tokenInput.value.trim());
+  });
+
+  // ── load data ──
+  Promise.all([
+    fetch('photos.json?v=' + Date.now()).then(r => r.json()).catch(() => []),
+    fetch('rolls.json?v=' + Date.now()).then(r => r.json()).catch(() => []),
+  ]).then(([photos, rolls]) => {
+    allPhotos = photos;
+    allRolls = rolls;
+    renderRollNav();
+    renderGrid();
+  });
+
+  // ── roll nav ──
+  function renderRollNav() {
+    rollNav.innerHTML = '';
+
+    const allTab = document.createElement('button');
+    allTab.className = 'roll-tab' + (activeRoll === null ? ' active' : '');
+    allTab.textContent = 'all';
+    allTab.addEventListener('click', () => { activeRoll = null; renderRollNav(); renderGrid(); });
+    rollNav.appendChild(allTab);
+
+    allRolls.forEach(roll => {
+      const tab = document.createElement('button');
+      tab.className = 'roll-tab' + (activeRoll === roll.id ? ' active' : '');
+      const datePart = roll.date ? ' \u00b7 ' + roll.date : '';
+      tab.textContent = (roll.name || roll.id) + datePart;
+      tab.addEventListener('click', () => { activeRoll = roll.id; renderRollNav(); renderGrid(); });
+      rollNav.appendChild(tab);
+    });
+  }
+
+  // ── grid ──
+  function renderGrid() {
+    grid.innerHTML = '';
+
+    const visible = allPhotos
+      .map((p, i) => ({ ...p, _i: i }))
+      .filter(p => activeRoll === null || p.roll === activeRoll);
+
+    if (visible.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'empty';
+      empty.textContent = '[ no photos here ]';
+      grid.appendChild(empty);
+      return;
+    }
+
+    visible.forEach(photo => {
+      const i = photo._i;
+      const current = { ...photo, ...(edits[i] || {}) };
+      const isDeleted = deletions.has(i);
+      const isModified = !!edits[i] && !isDeleted;
+
+      const card = document.createElement('div');
+      card.className = 'card' + (isDeleted ? ' deleted' : '') + (isModified ? ' modified' : '');
+      card.dataset.index = i;
+
+      // thumbnail
+      const thumb = document.createElement('div');
+      thumb.className = 'card-thumb';
+      const img = document.createElement('img');
+      img.src = `photos/${photo.file}`;
+      img.alt = photo.file;
+      img.loading = 'lazy';
+      thumb.appendChild(img);
+      card.appendChild(thumb);
+
+      // fields
+      const fields = document.createElement('div');
+      fields.className = 'card-fields';
+
+      // title
+      const titleLabel = document.createElement('div');
+      titleLabel.className = 'field-label';
+      titleLabel.textContent = 'title';
+      fields.appendChild(titleLabel);
+
+      const titleInput = document.createElement('input');
+      titleInput.type = 'text';
+      titleInput.placeholder = 'title';
+      titleInput.value = current.title || '';
+      titleInput.disabled = isDeleted;
+      titleInput.addEventListener('input', () => {
+        setEdit(i, 'title', titleInput.value);
+      });
+      fields.appendChild(titleInput);
+
+      // caption
+      const capLabel = document.createElement('div');
+      capLabel.className = 'field-label';
+      capLabel.textContent = 'caption';
+      fields.appendChild(capLabel);
+
+      const capInput = document.createElement('input');
+      capInput.type = 'text';
+      capInput.placeholder = 'caption';
+      capInput.value = current.caption || '';
+      capInput.disabled = isDeleted;
+      capInput.addEventListener('input', () => {
+        setEdit(i, 'caption', capInput.value);
+      });
+      fields.appendChild(capInput);
+
+      // roll
+      const rollLabel = document.createElement('div');
+      rollLabel.className = 'field-label';
+      rollLabel.textContent = 'roll';
+      fields.appendChild(rollLabel);
+
+      const rollSelect = document.createElement('select');
+      rollSelect.disabled = isDeleted;
+
+      const noneOpt = document.createElement('option');
+      noneOpt.value = '';
+      noneOpt.textContent = '— no roll —';
+      rollSelect.appendChild(noneOpt);
+
+      allRolls.forEach(roll => {
+        const opt = document.createElement('option');
+        opt.value = roll.id;
+        const datePart = roll.date ? ' · ' + roll.date : '';
+        opt.textContent = (roll.name || roll.id) + datePart;
+        if ((current.roll || '') === roll.id) opt.selected = true;
+        rollSelect.appendChild(opt);
+      });
+
+      rollSelect.addEventListener('change', () => {
+        setEdit(i, 'roll', rollSelect.value);
+      });
+      fields.appendChild(rollSelect);
+
+      card.appendChild(fields);
+
+      // actions
+      const actions = document.createElement('div');
+      actions.className = 'card-actions';
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn-delete';
+      delBtn.textContent = isDeleted ? 'undo' : 'delete';
+      delBtn.addEventListener('click', () => {
+        if (deletions.has(i)) {
+          deletions.delete(i);
+        } else {
+          deletions.add(i);
+        }
+        updateSaveBar();
+        renderGrid();
+      });
+      actions.appendChild(delBtn);
+
+      card.appendChild(actions);
+      grid.appendChild(card);
+    });
+  }
+
+  function setEdit(index, field, value) {
+    const original = allPhotos[index];
+    if (!edits[index]) edits[index] = {};
+    edits[index][field] = value;
+
+    // clean up if identical to original
+    const orig = {
+      title: original.title || '',
+      caption: original.caption || '',
+      roll: original.roll || '',
+    };
+    if (
+      (edits[index].title === undefined || edits[index].title === orig.title) &&
+      (edits[index].caption === undefined || edits[index].caption === orig.caption) &&
+      (edits[index].roll === undefined || edits[index].roll === orig.roll)
+    ) {
+      delete edits[index];
+    }
+
+    updateSaveBar();
+  }
+
+  function updateSaveBar() {
+    const editCount = Object.keys(edits).filter(i => !deletions.has(Number(i))).length;
+    const delCount = deletions.size;
+    const total = editCount + delCount;
+    saveBtn.disabled = total === 0;
+
+    if (total === 0) {
+      changeCount.textContent = '';
+    } else {
+      const parts = [];
+      if (editCount > 0) parts.push(`${editCount} edited`);
+      if (delCount > 0) parts.push(`${delCount} deleted`);
+      changeCount.textContent = parts.join(', ');
+    }
+  }
+
+  // ── save ──
+  saveBtn.addEventListener('click', doSave);
+
+  async function doSave() {
+    const token = tokenInput.value.trim();
+    if (!token) { appendLog('set a github token first', 'err'); return; }
+
+    saveBtn.disabled = true;
+    const headers = {
+      Authorization: `token ${token}`,
+      Accept: 'application/vnd.github+json',
+    };
+
+    try {
+      // 1. delete image files
+      for (const i of deletions) {
+        const file = allPhotos[i].file;
+        appendLog(`deleting ${file}...`);
+        const path = `photos/${file}`;
+        const res = await fetch(`${API}/repos/${REPO}/contents/${path}?ref=${BRANCH}`, { headers });
+        if (res.ok) {
+          const data = await res.json();
+          const delRes = await fetch(`${API}/repos/${REPO}/contents/${path}`, {
+            method: 'DELETE',
+            headers,
+            body: JSON.stringify({
+              message: `Delete photo: ${file}`,
+              sha: data.sha,
+              branch: BRANCH,
+            }),
+          });
+          if (!delRes.ok) throw new Error(`failed to delete ${file} — ${delRes.status}`);
+          appendLog(`${file} deleted`, 'ok');
+        } else {
+          appendLog(`${file} not found on remote, skipping file delete`);
+        }
+      }
+
+      // 2. build updated manifest
+      let updated = allPhotos
+        .map((p, i) => {
+          if (deletions.has(i)) return null;
+          const e = edits[i] || {};
+          const entry = { ...p };
+          if ('title' in e) {
+            if (e.title.trim()) entry.title = e.title.trim();
+            else delete entry.title;
+          }
+          if ('caption' in e) {
+            if (e.caption.trim()) entry.caption = e.caption.trim();
+            else delete entry.caption;
+          }
+          if ('roll' in e) {
+            if (e.roll) entry.roll = e.roll;
+            else delete entry.roll;
+          }
+          return entry;
+        })
+        .filter(Boolean);
+
+      // 3. write photos.json
+      appendLog('updating photos.json...');
+      const manifestRes = await fetch(`${API}/repos/${REPO}/contents/photos.json?ref=${BRANCH}`, { headers });
+      if (!manifestRes.ok) throw new Error('could not read photos.json');
+      const manifestData = await manifestRes.json();
+
+      const putRes = await fetch(`${API}/repos/${REPO}/contents/photos.json`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          message: 'Update photo manifest',
+          content: btoa(JSON.stringify(updated, null, 2) + '\n'),
+          sha: manifestData.sha,
+          branch: BRANCH,
+        }),
+      });
+      if (!putRes.ok) throw new Error('failed to update photos.json');
+      appendLog('photos.json updated', 'ok');
+      appendLog('done! gallery will update shortly.', 'ok');
+
+      // reset state
+      allPhotos = updated;
+      edits = {};
+      deletions.clear();
+      updateSaveBar();
+      renderRollNav();
+      renderGrid();
+
+    } catch (err) {
+      appendLog(err.message, 'err');
+      saveBtn.disabled = false;
+    }
+  }
+
+  function appendLog(msg, type) {
+    const line = document.createElement('div');
+    if (type) line.className = type;
+    line.textContent = '> ' + msg;
+    log.appendChild(line);
+    log.scrollTop = log.scrollHeight;
+  }
+</script>
+</body>
+</html>
