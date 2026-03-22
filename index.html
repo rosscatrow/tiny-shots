@@ -124,8 +124,10 @@
 
     /* ── gallery ── */
     .gallery {
-      column-width: 180px;
-      column-gap: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
       max-width: 100%;
       margin: 0 auto;
     }
@@ -135,11 +137,8 @@
       background: #fff;
       border: 2px solid #000;
       padding: 6px;
-      margin-bottom: 16px;
-      break-inside: avoid;
-      display: inline-block;
       width: 90%;
-      margin-left: 5%;
+      max-width: 500px;
       cursor: pointer;
       transition: box-shadow 0.1s, transform 0.1s;
     }
@@ -206,42 +205,6 @@
       letter-spacing: 1px;
     }
 
-    footer .best-viewed {
-      margin-top: 8px;
-      font-size: 0.55rem;
-      color: #999;
-    }
-
-    /* ── webring ── */
-    .webring {
-      text-align: center;
-      margin-top: 12px;
-      padding: 6px;
-      border: 1px dashed #666;
-      font-size: 0.6rem;
-      color: #666;
-      letter-spacing: 1px;
-    }
-
-    .webring a {
-      color: #000;
-      text-decoration: underline;
-      margin: 0 4px;
-    }
-
-    /* ── under construction ── */
-    .construction {
-      text-align: center;
-      font-size: 0.65rem;
-      color: #000;
-      margin-top: 10px;
-      letter-spacing: 2px;
-      animation: blink 1.2s step-end infinite;
-    }
-
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
 
     /* ── scrollbar ── */
     ::-webkit-scrollbar { width: 16px; }
@@ -280,18 +243,9 @@
 
     <hr class="divider">
 
-    <div class="construction">** under construction **</div>
-
     <footer>
-      shot on kodak charmera &bull; no zoom, no filter, no apologies
-      <p class="best-viewed">best viewed with netscape navigator 4.0 at 800x600</p>
+      shot on kodak charmera
     </footer>
-
-    <div class="webring">
-      &laquo; <a href="#">prev</a> |
-      [ disposable camera web ring ] |
-      <a href="#">next</a> &raquo;
-    </div>
 
   </div>
 </div>
