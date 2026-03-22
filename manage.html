@@ -687,7 +687,7 @@
         headers,
         body: JSON.stringify({
           message: 'Update photo manifest',
-          content: btoa(JSON.stringify(updated, null, 2) + '\n'),
+          content: btoa(unescape(encodeURIComponent(JSON.stringify(updated, null, 2) + '\n'))),
           sha: manifestData.sha,
           branch: BRANCH,
         }),
