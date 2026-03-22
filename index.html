@@ -208,30 +208,25 @@
 </div>
 
 <script>
-  // ── edit this array to add photos ──────────────────────────────────────────
-  const photos = [
-    // { file: "IMG_0001.jpg", caption: "optional caption" },
-    // { file: "IMG_0002.jpg" },
-  ];
-  // ──────────────────────────────────────────────────────────────────────────
-
   const gallery = document.getElementById('gallery');
 
   function pad(n) { return String(n).padStart(2, '0'); }
 
-  // random rotation ±1–4 degrees, alternating sign
   function randomRot(i) {
     const mag = 1 + Math.random() * 3;
     const sign = (i % 2 === 0) ? 1 : -1;
     return (sign * mag).toFixed(2);
   }
 
-  if (photos.length === 0) {
-    const empty = document.createElement('p');
-    empty.className = 'empty';
-    empty.textContent = 'no shots yet — drop some jpgs in photos/';
-    gallery.appendChild(empty);
-  } else {
+  function renderGallery(photos) {
+    gallery.innerHTML = '';
+    if (photos.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'empty';
+      empty.textContent = 'no shots yet';
+      gallery.appendChild(empty);
+      return;
+    }
     photos.forEach((photo, i) => {
       const rot = randomRot(i);
 
@@ -258,11 +253,14 @@
       }
 
       gallery.appendChild(card);
-
-      // staggered entrance
       setTimeout(() => card.classList.add('visible'), 80 + i * 60);
     });
   }
+
+  fetch('photos.json')
+    .then(r => r.json())
+    .then(renderGallery)
+    .catch(() => renderGallery([]));
 </script>
 </body>
 </html>
