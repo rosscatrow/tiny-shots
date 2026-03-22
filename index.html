@@ -257,7 +257,7 @@
     });
   }
 
-  fetch('photos.json')
+  fetch('photos.json?v=' + Date.now())
     .then(r => r.json())
     .then(renderGallery)
     .catch(() => renderGallery([]));
