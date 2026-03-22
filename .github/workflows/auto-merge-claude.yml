@@ -1,4 +1,4 @@
-name: Auto-merge claude/* branches into main
+name: Auto-merge claude/* branches into main and deploy
 
 on:
   push:
@@ -7,10 +7,15 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
-  merge:
+  merge-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,3 +30,12 @@ jobs:
           git pull origin main
           git merge --no-ff "${{ github.ref_name }}" -m "Auto-merge ${{ github.ref_name }} into main"
           git push origin main
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
