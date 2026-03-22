@@ -649,7 +649,7 @@
         let rollsSha = null;
         if (rollsRes.ok) {
           const rollsData = await rollsRes.json();
-          existingRolls = JSON.parse(atob(rollsData.content.replace(/\n/g, '')));
+          existingRolls = JSON.parse(decodeContent(rollsData.content));
           rollsSha = rollsData.sha;
         }
 
@@ -680,7 +680,7 @@
       const manifestRes = await fetch(`${API}/repos/${REPO}/contents/photos.json?ref=${BRANCH}`, { headers });
       if (!manifestRes.ok) throw new Error('could not read photos.json — ' + manifestRes.status);
       const manifestData = await manifestRes.json();
-      let manifest = JSON.parse(atob(manifestData.content.replace(/\n/g, '')));
+      let manifest = JSON.parse(decodeContent(manifestData.content));
       let manifestSha = manifestData.sha;
 
       // 2. upload each image
@@ -789,6 +789,11 @@
         await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)));
       }
     }
+  }
+
+  function decodeContent(b64) {
+    const bytes = Uint8Array.from(atob(b64.replace(/\n/g, '')), c => c.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
   }
 
   function sanitizeFilename(name) {

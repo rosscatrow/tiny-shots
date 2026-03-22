@@ -583,10 +583,16 @@
         if (!key) { appendLog('set an anthropic key first', 'err'); return; }
         genBtn.disabled = true;
         genBtn.textContent = '...';
-        const title = await generateTitle(`photos/${photo.file}`, key);
-        if (title) {
-          titleInput.value = title;
-          setEdit(i, 'title', title);
+        try {
+          const title = await generateTitle(`photos/${photo.file}`, key);
+          if (title) {
+            titleInput.value = title;
+            setEdit(i, 'title', title);
+          } else {
+            appendLog(`no title returned for ${photo.file}`, 'err');
+          }
+        } catch (err) {
+          appendLog(`gen title failed: ${err.message}`, 'err');
         }
         genBtn.textContent = 'gen title';
         genBtn.disabled = false;
@@ -745,44 +751,44 @@
   }
 
   async function generateTitle(imgPath, key) {
-    try {
-      const res = await fetch(imgPath);
-      const blob = await res.blob();
-      const dataUrl = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-      const base64 = dataUrl.split(',')[1];
-      const mimeType = dataUrl.split(';')[0].split(':')[1];
+    const imgRes = await fetch(imgPath);
+    if (!imgRes.ok) throw new Error(`could not load image (${imgRes.status})`);
+    const blob = await imgRes.blob();
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+    const base64 = dataUrl.split(',')[1];
+    const mimeType = dataUrl.split(';')[0].split(':')[1];
 
-      const apiRes = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': key,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 24,
-          messages: [{
-            role: 'user',
-            content: [
-              { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64 } },
-              { type: 'text', text: 'Give this photo a short weird title. Rules: start with one emoji, then 1–3 more words, be evocative and strange not descriptive. Reply with the title only. Examples: "🪸 haunted by the light" · "🧲 something remembered wrongly" · "🫧 almost a tuesday" · "🕳️ fell into it sideways"' },
-            ],
-          }],
-        }),
-      });
-      if (!apiRes.ok) return null;
-      const data = await apiRes.json();
-      return data.content?.[0]?.text?.trim() || null;
-    } catch (_) {
-      return null;
+    const apiRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 24,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64 } },
+            { type: 'text', text: 'Give this photo a short weird title. Rules: start with one emoji, then 1–3 more words, be evocative and strange not descriptive. Reply with the title only. Examples: "🪸 haunted by the light" · "🧲 something remembered wrongly" · "🫧 almost a tuesday" · "🕳️ fell into it sideways"' },
+          ],
+        }],
+      }),
+    });
+    if (!apiRes.ok) {
+      const err = await apiRes.json().catch(() => ({}));
+      throw new Error(`API error ${apiRes.status}: ${err.error?.message || 'unknown'}`);
     }
+    const data = await apiRes.json();
+    return data.content?.[0]?.text?.trim() || null;
   }
 
   function appendLog(msg, type) {
