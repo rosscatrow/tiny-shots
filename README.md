@@ -6,17 +6,21 @@ Live at [shots.catrow.net](https://shots.catrow.net)
 
 ## Adding photos
 
-Drop JPEGs into `photos/`, then update the `photos` array near the top of `index.html`:
+Drop JPEGs into `photos/`, then add entries to `photos.json`:
 
-```js
-const photos = [
-  { file: "IMG_0001.jpg", caption: "optional caption" },
-  { file: "IMG_0002.jpg" },
-];
+```json
+{ "file": "img_0001.jpeg", "title": "caption here", "roll": "roll-001" }
 ```
+
+Rolls are defined in `rolls.json`. The gallery reads both files at runtime and renders cards with filterable roll tabs.
 
 ## Tech
 
-Single-file site. No build step, no dependencies, no framework. Just an HTML file with inline CSS and JS.
+Zero-dependency static site. No build step, no framework, no bundler. Classic Mac OS aesthetic with inline CSS and JS.
+
+- `index.html` — public gallery
+- `photos.json` / `rolls.json` — photo and roll metadata
+- `admin.html` / `manage.html` / `upload.html` — admin tools
+- `favicon.svg` / `favicon.ico` — pixel-art camera icon
 
 Shot on Kodak Charmera · 1.6MP · 2026
