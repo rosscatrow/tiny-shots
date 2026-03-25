@@ -353,6 +353,160 @@
     ::-webkit-scrollbar-track { background: #c0c0c0; border-left: 1px solid #000; }
     ::-webkit-scrollbar-thumb { background: #fff; border: 2px solid #000; }
 
+    /* ── password gate ── */
+    .gate-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: #c0c0c0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23c0c0c0'/%3E%3Crect width='1' height='1' x='0' y='0' fill='%23a0a0a0'/%3E%3Crect width='1' height='1' x='2' y='2' fill='%23a0a0a0'/%3E%3C/svg%3E");
+      z-index: 5000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gate-overlay.hidden { display: none; }
+
+    .gate-dialog {
+      border: 2px solid #000;
+      box-shadow: 4px 4px 0 #000;
+      background: #fff;
+      width: 320px;
+      max-width: 90vw;
+    }
+
+    .gate-dialog .title-bar {
+      background: #fff;
+      border-bottom: 2px solid #000;
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-image:
+        repeating-linear-gradient(
+          transparent 0px, transparent 1px,
+          #000 1px, #000 2px,
+          transparent 2px, transparent 3px
+        );
+    }
+
+    .gate-body {
+      padding: 20px 24px 24px;
+      text-align: center;
+    }
+
+    .gate-body label {
+      display: block;
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .gate-body input[type="password"] {
+      width: 100%;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      padding: 6px 8px;
+      border: 2px solid #000;
+      background: #fff;
+      outline: none;
+      letter-spacing: 2px;
+    }
+
+    .gate-body input[type="password"]:focus {
+      box-shadow: 0 0 0 1px #000;
+    }
+
+    .gate-body button {
+      margin-top: 12px;
+      font-family: 'Chicago', 'Geneva', 'Charcoal', 'Lucida Grande', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      padding: 6px 20px;
+      border: 2px solid #000;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .gate-body button:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    .gate-body button:active {
+      box-shadow: inset 1px 1px 0 #333;
+    }
+
+    .gate-error {
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      color: #000;
+      margin-top: 8px;
+      letter-spacing: 1px;
+      visibility: hidden;
+    }
+
+    .gate-error.visible { visibility: visible; }
+
+    .content-gated { display: none; }
+    .content-gated.unlocked { display: block; }
+
+    /* ── roll settings ── */
+    .roll-pw-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .roll-pw-row .roll-pw-name {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      min-width: 80px;
+    }
+
+    .roll-pw-row input {
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      padding: 3px 6px;
+      border: 2px solid #000;
+      background: #fff;
+      outline: none;
+      flex: 1;
+      min-width: 100px;
+    }
+
+    .roll-pw-row input:focus {
+      box-shadow: 0 0 0 1px #000;
+    }
+
+    .roll-pw-row button {
+      font-family: 'Chicago', 'Geneva', 'Charcoal', 'Lucida Grande', sans-serif;
+      font-size: 0.6rem;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border: 2px solid #000;
+      background: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .roll-pw-row button:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    .roll-pw-status {
+      font-family: 'Courier New', monospace;
+      font-size: 0.6rem;
+      color: #555;
+      letter-spacing: 1px;
+    }
+
     @media (max-width: 520px) {
       .window { margin: 8px; }
       .window-body { padding: 14px; }
@@ -363,6 +517,24 @@
   </style>
 </head>
 <body>
+
+<!-- password gate overlay -->
+<div class="gate-overlay" id="gateOverlay">
+  <div class="gate-dialog">
+    <div class="title-bar">
+      <div class="close-box"></div>
+      <span class="title-bar-text">password required</span>
+    </div>
+    <div class="gate-body">
+      <label>enter admin password</label>
+      <input type="password" id="gateInput" autocomplete="off" autofocus>
+      <button id="gateSubmit">enter</button>
+      <p class="gate-error" id="gateError">[ incorrect password ]</p>
+    </div>
+  </div>
+</div>
+
+<div class="content-gated" id="contentGated">
 <div class="window">
   <div class="title-bar">
     <div class="close-box"></div>
@@ -393,6 +565,15 @@
 
     <div class="roll-nav" id="rollNav"></div>
 
+    <!-- roll settings toggle -->
+    <div style="margin-bottom: 10px;">
+      <button class="roll-tab" id="rollSettingsToggle" style="font-size: 0.6rem; letter-spacing: 2px;">&#9881; roll settings</button>
+    </div>
+    <div id="rollSettings" style="display: none; margin-bottom: 14px; border: 2px solid #000; padding: 12px; background: #fff;">
+      <div style="font-family: 'Courier New', monospace; font-size: 0.65rem; letter-spacing: 1px; color: #555; margin-bottom: 10px;">set or clear passwords on rolls</div>
+      <div id="rollPasswordList"></div>
+    </div>
+
     <div class="grid" id="grid"></div>
 
     <div class="save-bar">
@@ -421,12 +602,21 @@
   const saveBtn = document.getElementById('saveBtn');
   const changeCount = document.getElementById('changeCount');
   const log = document.getElementById('log');
+  const rollSettingsToggle = document.getElementById('rollSettingsToggle');
+  const rollSettingsPanel = document.getElementById('rollSettings');
+  const rollPasswordList = document.getElementById('rollPasswordList');
 
   let allPhotos = [];   // original data from photos.json
   let allRolls = [];
   let edits = {};       // { index: { title, caption, roll } } — pending field edits
   let deletions = new Set(); // indices marked for deletion
   let activeRoll = null;
+  let rollPasswordEdits = {}; // { rollId: newHashOrNull } — pending roll password changes
+
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
 
   // ── token ──
   tokenInput.value = localStorage.getItem('ts_token') || '';
@@ -447,8 +637,102 @@
     allPhotos = photos;
     allRolls = rolls;
     renderRollNav();
+    renderRollSettings();
     renderGrid();
   });
+
+  // ── roll settings toggle ──
+  rollSettingsToggle.addEventListener('click', () => {
+    const open = rollSettingsPanel.style.display !== 'none';
+    rollSettingsPanel.style.display = open ? 'none' : 'block';
+    rollSettingsToggle.textContent = (open ? '\u2699 roll settings' : '\u2699 roll settings \u25B4');
+  });
+
+  function renderRollSettings() {
+    rollPasswordList.innerHTML = '';
+    if (allRolls.length === 0) {
+      rollPasswordList.innerHTML = '<div class="roll-pw-status">[ no rolls ]</div>';
+      return;
+    }
+
+    allRolls.forEach(roll => {
+      const row = document.createElement('div');
+      row.className = 'roll-pw-row';
+
+      const name = document.createElement('span');
+      name.className = 'roll-pw-name';
+      name.textContent = roll.name || roll.id;
+      row.appendChild(name);
+
+      const hasPassword = !!(rollPasswordEdits[roll.id] !== undefined ? rollPasswordEdits[roll.id] : roll.password);
+
+      if (hasPassword && rollPasswordEdits[roll.id] === undefined) {
+        // has existing password, no pending edit
+        const status = document.createElement('span');
+        status.className = 'roll-pw-status';
+        status.textContent = '\u25A3 protected';
+        row.appendChild(status);
+
+        const clearBtn = document.createElement('button');
+        clearBtn.textContent = 'clear';
+        clearBtn.addEventListener('click', () => {
+          rollPasswordEdits[roll.id] = null;
+          renderRollSettings();
+          updateSaveBar();
+        });
+        row.appendChild(clearBtn);
+      } else if (rollPasswordEdits[roll.id] === null) {
+        // pending removal
+        const status = document.createElement('span');
+        status.className = 'roll-pw-status';
+        status.textContent = '\u25A1 will be removed';
+        row.appendChild(status);
+
+        const undoBtn = document.createElement('button');
+        undoBtn.textContent = 'undo';
+        undoBtn.addEventListener('click', () => {
+          delete rollPasswordEdits[roll.id];
+          renderRollSettings();
+          updateSaveBar();
+        });
+        row.appendChild(undoBtn);
+      } else if (rollPasswordEdits[roll.id]) {
+        // pending new password
+        const status = document.createElement('span');
+        status.className = 'roll-pw-status';
+        status.textContent = '\u25A3 new password set';
+        row.appendChild(status);
+
+        const undoBtn = document.createElement('button');
+        undoBtn.textContent = 'undo';
+        undoBtn.addEventListener('click', () => {
+          delete rollPasswordEdits[roll.id];
+          renderRollSettings();
+          updateSaveBar();
+        });
+        row.appendChild(undoBtn);
+      } else {
+        // no password, show set field
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'enter new password';
+        row.appendChild(input);
+
+        const setBtn = document.createElement('button');
+        setBtn.textContent = 'set';
+        setBtn.addEventListener('click', async () => {
+          const pw = input.value.trim();
+          if (!pw) return;
+          rollPasswordEdits[roll.id] = await sha256(pw);
+          renderRollSettings();
+          updateSaveBar();
+        });
+        row.appendChild(setBtn);
+      }
+
+      rollPasswordList.appendChild(row);
+    });
+  }
 
   // ── roll nav ──
   function renderRollNav() {
@@ -645,7 +929,8 @@
   function updateSaveBar() {
     const editCount = Object.keys(edits).filter(i => !deletions.has(Number(i))).length;
     const delCount = deletions.size;
-    const total = editCount + delCount;
+    const rollPwCount = Object.keys(rollPasswordEdits).length;
+    const total = editCount + delCount + rollPwCount;
     saveBtn.disabled = total === 0;
 
     if (total === 0) {
@@ -654,6 +939,7 @@
       const parts = [];
       if (editCount > 0) parts.push(`${editCount} edited`);
       if (delCount > 0) parts.push(`${delCount} deleted`);
+      if (rollPwCount > 0) parts.push(`${rollPwCount} roll pw`);
       changeCount.textContent = parts.join(', ');
     }
   }
@@ -736,14 +1022,49 @@
       });
       if (!putRes.ok) throw new Error('failed to update photos.json');
       appendLog('photos.json updated', 'ok');
+
+      // 4. update rolls.json if roll passwords changed
+      if (Object.keys(rollPasswordEdits).length > 0) {
+        appendLog('updating rolls.json...');
+        const updatedRolls = allRolls.map(r => {
+          const edit = rollPasswordEdits[r.id];
+          if (edit === undefined) return { ...r };
+          if (edit === null) {
+            const { password, ...rest } = r;
+            return rest;
+          }
+          return { ...r, password: edit };
+        });
+
+        const rollsRes = await fetch(`${API}/repos/${REPO}/contents/rolls.json?ref=${BRANCH}`, { headers });
+        if (!rollsRes.ok) throw new Error('could not read rolls.json');
+        const rollsData = await rollsRes.json();
+
+        const rollsPutRes = await fetch(`${API}/repos/${REPO}/contents/rolls.json`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({
+            message: 'Update roll passwords',
+            content: btoa(unescape(encodeURIComponent(JSON.stringify(updatedRolls, null, 2) + '\n'))),
+            sha: rollsData.sha,
+            branch: BRANCH,
+          }),
+        });
+        if (!rollsPutRes.ok) throw new Error('failed to update rolls.json');
+        appendLog('rolls.json updated', 'ok');
+        allRolls = updatedRolls;
+      }
+
       appendLog('done! gallery will update shortly.', 'ok');
 
       // reset state
       allPhotos = updated;
       edits = {};
       deletions.clear();
+      rollPasswordEdits = {};
       updateSaveBar();
       renderRollNav();
+      renderRollSettings();
       renderGrid();
 
     } catch (err) {
@@ -800,6 +1121,52 @@
     log.appendChild(line);
     log.scrollTop = log.scrollHeight;
   }
+</script>
+</div>
+
+<script>
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  async function initGate() {
+    if (sessionStorage.getItem('ts_admin_unlocked') === '1') {
+      document.getElementById('gateOverlay').classList.add('hidden');
+      document.getElementById('contentGated').classList.add('unlocked');
+      return;
+    }
+
+    const config = await fetch('/site-config.json?v=' + Date.now()).then(r => r.json()).catch(() => null);
+    if (!config || !config.adminPasswordHash) {
+      document.getElementById('gateOverlay').classList.add('hidden');
+      document.getElementById('contentGated').classList.add('unlocked');
+      return;
+    }
+
+    const input = document.getElementById('gateInput');
+    const btn = document.getElementById('gateSubmit');
+    const error = document.getElementById('gateError');
+
+    async function tryUnlock() {
+      const hash = await sha256(input.value);
+      if (hash === config.adminPasswordHash) {
+        sessionStorage.setItem('ts_admin_unlocked', '1');
+        document.getElementById('gateOverlay').classList.add('hidden');
+        document.getElementById('contentGated').classList.add('unlocked');
+      } else {
+        error.classList.add('visible');
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    btn.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+    input.focus();
+  }
+
+  initGate();
 </script>
 </body>
 </html>
