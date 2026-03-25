@@ -226,6 +226,78 @@
       text-transform: lowercase;
     }
 
+    /* ── roll lock ── */
+    .roll-tab .lock-icon {
+      display: inline;
+      font-size: 0.6rem;
+      margin-left: 3px;
+    }
+
+    /* ── roll password prompt ── */
+    .roll-gate {
+      text-align: center;
+      padding: 40px 0;
+    }
+
+    .roll-gate label {
+      display: block;
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .roll-gate-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+
+    .roll-gate input[type="password"] {
+      flex: 1;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      padding: 5px 8px;
+      border: 2px solid #000;
+      background: #fff;
+      outline: none;
+      letter-spacing: 2px;
+    }
+
+    .roll-gate input[type="password"]:focus {
+      box-shadow: 0 0 0 1px #000;
+    }
+
+    .roll-gate button {
+      font-family: 'Chicago', 'Geneva', 'Charcoal', 'Lucida Grande', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      padding: 5px 14px;
+      border: 2px solid #000;
+      background: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .roll-gate button:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    .roll-gate-error {
+      font-family: 'Courier New', monospace;
+      font-size: 0.6rem;
+      color: #000;
+      margin-top: 8px;
+      letter-spacing: 1px;
+      visibility: hidden;
+    }
+
+    .roll-gate-error.visible { visibility: visible; }
+
     /* ── empty state ── */
     .empty {
       text-align: center;
@@ -303,6 +375,30 @@
 
   function pad(n) { return String(n).padStart(2, '0'); }
 
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  function getUnlockedRolls() {
+    try {
+      return JSON.parse(sessionStorage.getItem('ts_unlocked_rolls') || '[]');
+    } catch { return []; }
+  }
+
+  function setRollUnlocked(rollId) {
+    const unlocked = getUnlockedRolls();
+    if (!unlocked.includes(rollId)) {
+      unlocked.push(rollId);
+      sessionStorage.setItem('ts_unlocked_rolls', JSON.stringify(unlocked));
+    }
+  }
+
+  function isRollLocked(roll) {
+    if (!roll.password) return false;
+    return !getUnlockedRolls().includes(roll.id);
+  }
+
   function getActiveRoll() {
     const hash = location.hash.slice(1);
     return hash || null;
@@ -310,7 +406,11 @@
 
   function getFilteredPhotos() {
     const active = getActiveRoll();
-    if (active === null) return allPhotos;
+    if (active === null) {
+      // "All" view — exclude photos from locked rolls
+      const lockedIds = allRolls.filter(r => isRollLocked(r)).map(r => r.id);
+      return allPhotos.filter(p => !lockedIds.includes(p.roll));
+    }
     return allPhotos.filter(p => p.roll === active);
   }
 
@@ -333,6 +433,12 @@
       tab.className = 'roll-tab' + (activeRoll === roll.id ? ' active' : '');
       const datePart = roll.date ? ' \u00b7 ' + roll.date : '';
       tab.textContent = (roll.name || roll.id) + datePart;
+      if (roll.password) {
+        const lock = document.createElement('span');
+        lock.className = 'lock-icon';
+        lock.textContent = isRollLocked(roll) ? ' \u25A3' : ' \u25A1';
+        tab.appendChild(lock);
+      }
       tab.addEventListener('click', () => {
         location.hash = roll.id;
       });
@@ -348,7 +454,66 @@
     }
   }
 
+  function renderRollGate(roll) {
+    gallery.innerHTML = '';
+    const gate = document.createElement('div');
+    gate.className = 'roll-gate';
+
+    const label = document.createElement('label');
+    label.textContent = 'this roll is protected — enter password';
+    gate.appendChild(label);
+
+    const row = document.createElement('div');
+    row.className = 'roll-gate-row';
+
+    const input = document.createElement('input');
+    input.type = 'password';
+    input.autocomplete = 'off';
+    input.placeholder = '';
+    row.appendChild(input);
+
+    const btn = document.createElement('button');
+    btn.textContent = 'enter';
+    row.appendChild(btn);
+
+    gate.appendChild(row);
+
+    const error = document.createElement('p');
+    error.className = 'roll-gate-error';
+    error.textContent = '[ incorrect password ]';
+    gate.appendChild(error);
+
+    async function tryUnlock() {
+      const hash = await sha256(input.value);
+      if (hash === roll.password) {
+        setRollUnlocked(roll.id);
+        renderRollNav();
+        renderGallery(getFilteredPhotos());
+      } else {
+        error.classList.add('visible');
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    btn.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+
+    gallery.appendChild(gate);
+    input.focus();
+  }
+
   function renderGallery(photos) {
+    // check if active roll is locked
+    const activeRoll = getActiveRoll();
+    if (activeRoll !== null) {
+      const roll = allRolls.find(r => r.id === activeRoll);
+      if (roll && isRollLocked(roll)) {
+        renderRollGate(roll);
+        return;
+      }
+    }
+
     gallery.innerHTML = '';
     if (photos.length === 0) {
       const empty = document.createElement('p');
