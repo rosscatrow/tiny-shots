@@ -716,6 +716,8 @@
         const input = document.createElement('input');
         input.type = 'text';
         input.placeholder = 'enter new password';
+        input.autocomplete = 'off';
+        input.autocapitalize = 'none';
         row.appendChild(input);
 
         const setBtn = document.createElement('button');

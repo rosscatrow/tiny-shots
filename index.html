@@ -256,7 +256,7 @@
       margin: 0 auto;
     }
 
-    .roll-gate input[type="password"] {
+    .roll-gate input[type="text"] {
       flex: 1;
       font-family: 'Courier New', monospace;
       font-size: 0.85rem;
@@ -267,7 +267,7 @@
       letter-spacing: 2px;
     }
 
-    .roll-gate input[type="password"]:focus {
+    .roll-gate input[type="text"]:focus {
       box-shadow: 0 0 0 1px #000;
     }
 
@@ -467,8 +467,9 @@
     row.className = 'roll-gate-row';
 
     const input = document.createElement('input');
-    input.type = 'password';
+    input.type = 'text';
     input.autocomplete = 'off';
+    input.autocapitalize = 'none';
     input.placeholder = '';
     row.appendChild(input);
 
