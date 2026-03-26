@@ -702,8 +702,12 @@
 
   async function generateTitle(item) {
     const key = anthropicInput.value.trim();
-    if (!key) return;
+    if (!key) {
+      appendLog('no anthropic key — skipping title generation');
+      return;
+    }
 
+    const filename = sanitizeFilename(item.file.name);
     const base64 = item.dataUrl.split(',')[1];
     const mimeType = item.dataUrl.split(';')[0].split(':')[1];
 
@@ -718,7 +722,7 @@
         },
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
-          max_tokens: 24,
+          max_tokens: 60,
           messages: [{
             role: 'user',
             content: [
@@ -729,15 +733,25 @@
         }),
       });
 
-      if (!res.ok) return;
+      if (!res.ok) {
+        const errBody = await res.text().catch(() => '');
+        const short = res.status === 401 ? 'invalid api key'
+          : res.status === 429 ? 'rate limited — try again shortly'
+          : res.status === 403 ? 'api key lacks permission'
+          : `api error ${res.status}`;
+        appendLog(`title gen failed for ${filename}: ${short}`, 'err');
+        return;
+      }
+
       const data = await res.json();
       const title = data.content?.[0]?.text?.trim();
       if (title) {
         item.title = title;
         item.titleReady = true;
+        appendLog(`title generated for ${filename}`, 'ok');
       }
-    } catch (_) {
-      // silently skip if title generation fails
+    } catch (err) {
+      appendLog(`title gen failed for ${filename}: ${err.message || 'network error'}`, 'err');
     }
   }
 
