@@ -1,5 +1,19 @@
 # changelog
 
+## v1.3.0
+
+- password-protect admin pages with sha-256 hashed gate (closes #18)
+- optional password protection for individual rolls (closes #17)
+- protected rolls show lock icon in gallery tab bar
+- photos from locked rolls hidden from "all" view until unlocked
+- inline password prompt styled in retro mac os aesthetic
+- roll password management in manage.html (set/clear per roll)
+- password field on new roll creation in upload.html
+- fix emoji picker not working in roll password fields (closes #21)
+- add admin link to gallery title bar (closes #23)
+- session-based unlock via sessionstorage for both admin and roll gates
+- new file: site-config.json for admin password hash
+
 ## v1.2.0
 
 - add pixel-art camera favicon in classic mac os icon style (closes #19)
