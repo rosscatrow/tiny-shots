@@ -1,5 +1,10 @@
 # changelog
 
+## v1.5.0
+
+- default home page to most recent roll instead of all photos (closes #25)
+- sort roll tabs newest-first, move "all" tab to the right
+
 ## v1.4.0
 
 - fix silent caption/emoji generation failures, add visible error logging (closes #22)
