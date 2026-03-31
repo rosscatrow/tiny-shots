@@ -578,6 +578,10 @@
   ]).then(([photos, rolls]) => {
     allPhotos = photos;
     allRolls = rolls;
+    // default to most recent roll on first load (no hash)
+    if (!location.hash && rolls.length > 0) {
+      history.replaceState(null, '', '#' + rolls[rolls.length - 1].id);
+    }
     renderRollNav();
     renderGallery(getFilteredPhotos());
   });
