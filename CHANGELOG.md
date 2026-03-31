@@ -1,5 +1,12 @@
 # changelog
 
+## v1.4.0
+
+- fix silent caption/emoji generation failures, add visible error logging (closes #22)
+- shrink gallery cards from 500px to 300px with polaroid-style padding (closes #24)
+- narrow site container from 780px to 520px for tighter desktop layout
+- add subtle gray dither pattern to window background
+
 ## v1.3.0
 
 - password-protect admin pages with sha-256 hashed gate (closes #18)
