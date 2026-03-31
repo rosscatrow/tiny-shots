@@ -208,6 +208,12 @@
       flex-wrap: wrap;
       gap: 6px;
       margin-bottom: 14px;
+      align-items: center;
+    }
+
+    .roll-nav-spacer {
+      flex: 1;
+      min-width: 8px;
     }
 
     .roll-tab {
@@ -436,15 +442,8 @@
     rollLabel.textContent = '';
     if (allRolls.length === 0) return;
 
-    const allTab = document.createElement('button');
-    allTab.className = 'roll-tab' + (activeRoll === null ? ' active' : '');
-    allTab.textContent = 'all';
-    allTab.addEventListener('click', () => {
-      location.hash = '';
-    });
-    rollNav.appendChild(allTab);
-
-    allRolls.forEach(roll => {
+    // rolls in reverse order (newest first)
+    [...allRolls].reverse().forEach(roll => {
       const tab = document.createElement('button');
       tab.className = 'roll-tab' + (activeRoll === roll.id ? ' active' : '');
       const datePart = roll.date ? ' \u00b7 ' + roll.date : '';
@@ -460,6 +459,18 @@
       });
       rollNav.appendChild(tab);
     });
+
+    const spacer = document.createElement('span');
+    spacer.className = 'roll-nav-spacer';
+    rollNav.appendChild(spacer);
+
+    const allTab = document.createElement('button');
+    allTab.className = 'roll-tab' + (activeRoll === null ? ' active' : '');
+    allTab.textContent = 'all';
+    allTab.addEventListener('click', () => {
+      location.hash = '';
+    });
+    rollNav.appendChild(allTab);
 
     if (activeRoll !== null) {
       const roll = allRolls.find(r => r.id === activeRoll);
