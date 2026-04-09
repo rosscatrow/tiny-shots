@@ -7,7 +7,6 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon.ico" sizes="32x32">
 
-  <!-- Open Graph / share preview -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="tiny shots">
   <meta property="og:title" id="og-title" content="a shot">
@@ -23,6 +22,10 @@
       color: #000;
       font-family: 'Chicago', 'Geneva', 'Charcoal', 'Lucida Grande', sans-serif;
       min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
       cursor: default;
       position: relative;
     }
@@ -37,279 +40,193 @@
       mix-blend-mode: multiply;
     }
 
-    /* ── mac window chrome ── */
-    .window {
-      max-width: 420px;
-      margin: 24px auto;
+    /* ── alert dialog ── */
+    .alert {
+      background: #fff;
       border: 2px solid #000;
-      box-shadow: 4px 4px 0 #000;
-      background-color: #fff;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23fff'/%3E%3Crect width='1' height='1' x='0' y='0' fill='%23999'/%3E%3Crect width='1' height='1' x='2' y='2' fill='%23999'/%3E%3C/svg%3E");
+      box-shadow: 6px 6px 0 #000;
+      width: 100%;
+      max-width: 380px;
+      padding: 20px 20px 16px;
     }
 
-    .title-bar {
-      background: #fff;
-      border-bottom: 2px solid #000;
-      padding: 4px 8px;
+    /* ── alert body: icon + content ── */
+    .alert-body {
       display: flex;
-      align-items: center;
-      gap: 8px;
-      background-image:
-        repeating-linear-gradient(
-          transparent 0px, transparent 1px,
-          #000 1px, #000 2px,
-          transparent 2px, transparent 3px
-        );
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 12px;
     }
 
-    .title-bar-text {
-      background: #fff;
-      padding: 0 8px;
-      font-size: 0.8rem;
-      font-weight: bold;
-      letter-spacing: 1px;
-      white-space: nowrap;
-    }
-
-    .close-box {
-      width: 14px;
-      height: 14px;
-      border: 2px solid #000;
-      background: #fff;
+    .alert-icon {
       flex-shrink: 0;
-      cursor: pointer;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 48px;
+      height: 48px;
     }
 
-    .close-box:hover {
-      background: #000;
+    .alert-content {
+      flex: 1;
+      min-width: 0;
     }
 
-    .window-body {
-      padding: 20px 24px 28px;
+    .alert-headline {
+      font-size: 0.75rem;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      line-height: 1.35;
+      word-break: break-word;
     }
 
-    /* ── photo display ── */
-    .photo-frame {
+    .alert-photo {
       border: 2px solid #000;
-      padding: 10px 10px 28px;
-      background: #fff;
-      margin-bottom: 14px;
-    }
-
-    .photo-frame img {
       display: block;
       width: 100%;
       height: auto;
-      border: 1px solid #000;
+      margin-bottom: 6px;
     }
 
-    .photo-caption {
-      font-size: 0.6rem;
-      color: #333;
-      margin-top: 6px;
-      text-align: center;
+    .alert-caption {
       font-family: 'Courier New', monospace;
+      font-size: 0.55rem;
+      color: #555;
       letter-spacing: 1px;
+      text-align: center;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    /* ── title ── */
-    .photo-title {
-      font-family: 'Courier New', monospace;
-      font-size: 0.9rem;
-      font-weight: normal;
-      color: #000;
-      letter-spacing: 1px;
-      margin-bottom: 14px;
-      min-height: 1.2em;
-    }
-
-    /* ── meta bar ── */
-    .meta-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .roll-link {
-      font-family: 'Courier New', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 1px;
-      color: #000;
-      text-decoration: none;
-      border: 2px solid #000;
-      padding: 3px 10px;
-      background: #fff;
-      display: inline-block;
-    }
-
-    .roll-link:hover {
-      background: #000;
-      color: #fff;
-    }
-
-    .frame-counter {
+    .alert-meta {
       font-family: 'Courier New', monospace;
       font-size: 0.6rem;
       color: #555;
-      letter-spacing: 2px;
-    }
-
-    /* ── navigation ── */
-    .nav-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .nav-btn {
-      font-family: 'Courier New', monospace;
-      font-size: 0.7rem;
       letter-spacing: 1px;
-      padding: 4px 12px;
-      border: 2px solid #000;
-      background: #fff;
-      cursor: pointer;
-      color: #000;
-      text-decoration: none;
-      display: inline-block;
+      margin-bottom: 14px;
     }
 
-    .nav-btn:hover:not(.disabled) {
-      background: #000;
-      color: #fff;
-    }
-
-    .nav-btn.disabled {
-      color: #aaa;
-      border-color: #aaa;
-      cursor: default;
-      pointer-events: none;
-    }
-
-    hr.divider {
+    /* ── divider ── */
+    .alert-divider {
       border: none;
       height: 2px;
       background: #000;
-      margin: 14px 0;
+      margin: 0 -20px 14px;
     }
 
-    /* ── share section ── */
-    .share-row {
+    /* ── button row ── */
+    .alert-buttons {
       display: flex;
-      align-items: center;
       gap: 8px;
+      justify-content: flex-end;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
-    .share-url {
-      flex: 1;
-      font-family: 'Courier New', monospace;
-      font-size: 0.6rem;
-      padding: 4px 7px;
-      border: 2px solid #000;
-      background: #f5f5f5;
-      color: #555;
+    .btn {
+      font-family: 'Chicago', 'Geneva', 'Charcoal', 'Lucida Grande', sans-serif;
+      font-size: 0.75rem;
       letter-spacing: 0.5px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      cursor: default;
-      user-select: all;
-    }
-
-    .share-btn {
-      font-family: 'Courier New', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 1px;
-      padding: 4px 12px;
+      padding: 5px 18px;
       border: 2px solid #000;
       background: #fff;
       cursor: pointer;
+      color: #000;
+      text-decoration: none;
+      display: inline-block;
       white-space: nowrap;
-      flex-shrink: 0;
+      min-width: 72px;
+      text-align: center;
     }
 
-    .share-btn:hover {
-      background: #000;
-      color: #fff;
+    .btn:hover { background: #000; color: #fff; }
+
+    /* default button: triple border (classic Mac) */
+    .btn-default {
+      box-shadow: 0 0 0 2px #000, 0 0 0 4px #fff, 0 0 0 6px #000;
+      margin: 4px;
     }
+
+    .btn-nav {
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      min-width: 0;
+    }
+
+    .btn-nav.disabled {
+      color: #bbb;
+      border-color: #bbb;
+      cursor: default;
+      pointer-events: none;
+    }
+    .btn-nav.disabled:hover { background: #fff; color: #bbb; }
+
+    .btn-spacer { flex: 1; }
 
     .share-confirm {
       font-family: 'Courier New', monospace;
-      font-size: 0.6rem;
+      font-size: 0.55rem;
       color: #555;
       letter-spacing: 1px;
-      text-align: center;
-      height: 1.2em;
-      margin-top: 6px;
+      align-self: center;
     }
 
-    /* ── loading / error ── */
     .status {
-      text-align: center;
       font-family: 'Courier New', monospace;
       font-size: 0.75rem;
       color: #555;
       letter-spacing: 2px;
-      padding: 60px 0;
+      text-align: center;
+      padding: 20px 0;
     }
 
-    /* ── scrollbar ── */
     ::-webkit-scrollbar { width: 16px; }
     ::-webkit-scrollbar-track { background: #c0c0c0; border-left: 1px solid #000; }
     ::-webkit-scrollbar-thumb { background: #fff; border: 2px solid #000; }
-
-    @media (max-width: 520px) {
-      .window { margin: 8px; }
-      .window-body { padding: 14px; }
-    }
   </style>
 </head>
 <body>
-<div class="window">
-  <div class="title-bar">
-    <a class="close-box" id="closeBtn" href="/"></a>
-    <span class="title-bar-text" id="titleBarText">shot</span>
-  </div>
-  <div class="window-body" id="windowBody">
-    <div class="status" id="status">[ loading ]</div>
-  </div>
+
+<div class="alert" id="alert">
+  <div class="status" id="status">[ loading ]</div>
 </div>
 
 <script>
   function pad(n) { return String(n).padStart(2, '0'); }
 
+  const CAMERA_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" shape-rendering="crispEdges">
+    <rect x="4" y="14" width="40" height="28" fill="#000"/>
+    <rect x="6" y="16" width="36" height="24" fill="#fff"/>
+    <rect x="14" y="8" width="12" height="8" fill="#000"/>
+    <rect x="16" y="10" width="8" height="4" fill="#fff"/>
+    <rect x="28" y="10" width="8" height="6" fill="#000"/>
+    <rect x="30" y="12" width="4" height="2" fill="#fff"/>
+    <rect x="16" y="20" width="16" height="16" fill="#000"/>
+    <rect x="18" y="22" width="12" height="12" fill="#fff"/>
+    <rect x="20" y="24" width="8" height="8" fill="#000"/>
+    <rect x="22" y="26" width="4" height="4" fill="#fff"/>
+    <rect x="36" y="18" width="4" height="4" fill="#000"/>
+    <rect x="37" y="19" width="2" height="2" fill="#fff"/>
+  </svg>`;
+
   const params = new URLSearchParams(location.search);
   const targetFile = params.get('file');
-  const targetRoll = params.get('roll');
 
   Promise.all([
     fetch('photos.json?v=' + Date.now()).then(r => r.json()).catch(() => []),
     fetch('rolls.json?v=' + Date.now()).then(r => r.json()).catch(() => [])
   ]).then(([allPhotos, allRolls]) => {
-    const status = document.getElementById('status');
-    const body = document.getElementById('windowBody');
+    const alertEl = document.getElementById('alert');
 
     if (!targetFile) {
-      status.textContent = '[ no photo specified ]';
+      document.getElementById('status').textContent = '[ no photo specified ]';
       return;
     }
 
-    // find the photo
     const photoIdx = allPhotos.findIndex(p => p.file === targetFile);
     if (photoIdx === -1) {
-      status.textContent = '[ shot not found ]';
+      document.getElementById('status').textContent = '[ shot not found ]';
       return;
     }
 
@@ -317,8 +234,6 @@
     const roll = allRolls.find(r => r.id === photo.roll) || null;
     const rollPhotos = allPhotos.filter(p => p.roll === photo.roll);
     const rollIdx = rollPhotos.findIndex(p => p.file === targetFile);
-
-    // prev/next within roll
     const prevPhoto = rollIdx > 0 ? rollPhotos[rollIdx - 1] : null;
     const nextPhoto = rollIdx < rollPhotos.length - 1 ? rollPhotos[rollIdx + 1] : null;
 
@@ -326,142 +241,109 @@
       return `/photo.html?file=${encodeURIComponent(p.file)}&roll=${encodeURIComponent(p.roll)}`;
     }
 
-    const rollName = roll ? (roll.name || roll.id) : (photo.roll || 'unknown roll');
+    const rollName = roll ? (roll.name || roll.id) : (photo.roll || 'unknown');
     const rollDate = roll && roll.date ? ' · ' + roll.date : '';
-    const frameNum = pad(rollIdx + 1);
-    const totalFrames = rollPhotos.length;
+    const shareUrl = location.origin + photoUrl(photo);
 
-    // update title bar
-    document.getElementById('titleBarText').textContent = photo.title || photo.file;
     document.title = (photo.title || photo.file) + ' — tiny shots';
-
-    // update OG image
     document.getElementById('og-image').content = location.origin + '/photos/' + photo.file;
     document.getElementById('og-title').content = photo.title || 'a shot';
 
-    const shareUrl = location.origin + photoUrl(photo);
+    alertEl.innerHTML = '';
 
-    // render
-    body.innerHTML = '';
+    // body: icon + content
+    const body = document.createElement('div');
+    body.className = 'alert-body';
 
-    // meta bar: roll back-link + frame counter
-    const metaBar = document.createElement('div');
-    metaBar.className = 'meta-bar';
+    const iconEl = document.createElement('div');
+    iconEl.className = 'alert-icon';
+    iconEl.innerHTML = CAMERA_SVG;
+    body.appendChild(iconEl);
 
-    const rollLink = document.createElement('a');
-    rollLink.className = 'roll-link';
-    rollLink.href = `/#${photo.roll}`;
-    rollLink.textContent = `← ${rollName}${rollDate}`;
-    metaBar.appendChild(rollLink);
+    const content = document.createElement('div');
+    content.className = 'alert-content';
 
-    const counter = document.createElement('span');
-    counter.className = 'frame-counter';
-    counter.textContent = `frame ${frameNum} / ${pad(totalFrames)}`;
-    metaBar.appendChild(counter);
-
-    body.appendChild(metaBar);
-
-    // title
     if (photo.title) {
-      const titleEl = document.createElement('p');
-      titleEl.className = 'photo-title';
-      titleEl.textContent = photo.title;
-      body.appendChild(titleEl);
+      const headline = document.createElement('p');
+      headline.className = 'alert-headline';
+      headline.textContent = photo.title;
+      content.appendChild(headline);
     }
 
-    // photo frame (polaroid style)
-    const frame = document.createElement('div');
-    frame.className = 'photo-frame';
-
     const img = document.createElement('img');
+    img.className = 'alert-photo';
     img.src = `photos/${photo.file}`;
     img.alt = photo.title || photo.file;
-    frame.appendChild(img);
+    content.appendChild(img);
 
     if (photo.caption) {
       const cap = document.createElement('p');
-      cap.className = 'photo-caption';
+      cap.className = 'alert-caption';
       cap.textContent = photo.caption;
-      frame.appendChild(cap);
+      content.appendChild(cap);
     }
 
-    body.appendChild(frame);
+    body.appendChild(content);
+    alertEl.appendChild(body);
 
-    // prev/next nav
-    const navRow = document.createElement('div');
-    navRow.className = 'nav-row';
+    // meta
+    const meta = document.createElement('p');
+    meta.className = 'alert-meta';
+    meta.textContent = `${rollName}${rollDate}  ·  frame ${pad(rollIdx + 1)} / ${pad(rollPhotos.length)}`;
+    alertEl.appendChild(meta);
 
-    if (prevPhoto) {
-      const prev = document.createElement('a');
-      prev.className = 'nav-btn';
-      prev.href = photoUrl(prevPhoto);
-      prev.textContent = '← prev';
-      navRow.appendChild(prev);
-    } else {
-      const prev = document.createElement('span');
-      prev.className = 'nav-btn disabled';
-      prev.textContent = '← prev';
-      navRow.appendChild(prev);
-    }
-
-    if (nextPhoto) {
-      const next = document.createElement('a');
-      next.className = 'nav-btn';
-      next.href = photoUrl(nextPhoto);
-      next.textContent = 'next →';
-      navRow.appendChild(next);
-    } else {
-      const next = document.createElement('span');
-      next.className = 'nav-btn disabled';
-      next.textContent = 'next →';
-      navRow.appendChild(next);
-    }
-
-    body.appendChild(navRow);
-
-    // share section
+    // divider
     const hr = document.createElement('hr');
-    hr.className = 'divider';
-    body.appendChild(hr);
+    hr.className = 'alert-divider';
+    alertEl.appendChild(hr);
 
-    const shareRow = document.createElement('div');
-    shareRow.className = 'share-row';
+    // buttons
+    const btns = document.createElement('div');
+    btns.className = 'alert-buttons';
 
-    const urlBox = document.createElement('div');
-    urlBox.className = 'share-url';
-    urlBox.textContent = shareUrl;
-    urlBox.title = shareUrl;
-    shareRow.appendChild(urlBox);
+    // prev
+    const prevEl = prevPhoto ? document.createElement('a') : document.createElement('span');
+    prevEl.className = 'btn btn-nav' + (prevPhoto ? '' : ' disabled');
+    if (prevPhoto) prevEl.href = photoUrl(prevPhoto);
+    prevEl.textContent = '← prev';
+    btns.appendChild(prevEl);
+
+    // next
+    const nextEl = nextPhoto ? document.createElement('a') : document.createElement('span');
+    nextEl.className = 'btn btn-nav' + (nextPhoto ? '' : ' disabled');
+    if (nextPhoto) nextEl.href = photoUrl(nextPhoto);
+    nextEl.textContent = 'next →';
+    btns.appendChild(nextEl);
+
+    const spacer = document.createElement('span');
+    spacer.className = 'btn-spacer';
+    btns.appendChild(spacer);
+
+    const confirm = document.createElement('span');
+    confirm.className = 'share-confirm';
+    btns.appendChild(confirm);
 
     const shareBtn = document.createElement('button');
-    shareBtn.className = 'share-btn';
-    shareBtn.textContent = '[copy]';
-    shareRow.appendChild(shareBtn);
-
-    body.appendChild(shareRow);
-
-    const confirm = document.createElement('p');
-    confirm.className = 'share-confirm';
-    body.appendChild(confirm);
-
+    shareBtn.className = 'btn';
+    shareBtn.textContent = 'Share';
     shareBtn.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(shareUrl);
-        confirm.textContent = '[ link copied ]';
+        confirm.textContent = '[ copied ]';
         setTimeout(() => { confirm.textContent = ''; }, 2000);
       } catch {
-        // fallback: select the text
-        const range = document.createRange();
-        range.selectNodeContents(urlBox);
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
         confirm.textContent = '[ select + copy ]';
       }
     });
+    btns.appendChild(shareBtn);
 
-    // close box goes back to roll
-    document.getElementById('closeBtn').href = `/#${photo.roll}`;
+    const okBtn = document.createElement('a');
+    okBtn.className = 'btn btn-default';
+    okBtn.href = `/#${photo.roll}`;
+    okBtn.textContent = 'OK';
+    btns.appendChild(okBtn);
+
+    alertEl.appendChild(btns);
   });
 </script>
 </body>
