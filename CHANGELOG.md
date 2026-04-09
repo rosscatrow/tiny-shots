@@ -8,6 +8,7 @@
 - larger title font, metadata moved below photo
 - proper rounded-rect buttons with default-button outline ring
 - remove share button from photo page
+- remove share button from gallery cards
 
 ## v1.5.0
 

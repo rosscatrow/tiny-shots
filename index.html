@@ -319,37 +319,6 @@
 
     .roll-gate-error.visible { visibility: visible; }
 
-    /* ── share button on card ── */
-    .card-footer {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 6px;
-    }
-
-    .card-share {
-      font-family: 'Courier New', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 1px;
-      color: #888;
-      text-decoration: none;
-      padding: 2px 6px;
-      border: 1px solid #ccc;
-      background: #fff;
-      cursor: pointer;
-      transition: color 0.1s, border-color 0.1s;
-      line-height: 1.4;
-    }
-
-    .card-share:hover {
-      color: #000;
-      border-color: #000;
-    }
-
-    .card-share.copied {
-      color: #555;
-      border-color: #555;
-    }
-
     /* ── empty state ── */
     .empty {
       text-align: center;
@@ -611,34 +580,6 @@
         cap.textContent = photo.caption;
         card.appendChild(cap);
       }
-
-      // share footer
-      const footer = document.createElement('div');
-      footer.className = 'card-footer';
-
-      const shareBtn = document.createElement('button');
-      shareBtn.className = 'card-share';
-      shareBtn.textContent = '[share]';
-      shareBtn.title = 'copy link to this photo';
-      shareBtn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const url = location.origin + photoPageUrl;
-        try {
-          await navigator.clipboard.writeText(url);
-        } catch {
-          // fallback: open share page
-          location.href = photoPageUrl;
-          return;
-        }
-        shareBtn.textContent = '[copied]';
-        shareBtn.classList.add('copied');
-        setTimeout(() => {
-          shareBtn.textContent = '[share]';
-          shareBtn.classList.remove('copied');
-        }, 1800);
-      });
-      footer.appendChild(shareBtn);
-      card.appendChild(footer);
 
       gallery.appendChild(card);
     });
