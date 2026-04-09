@@ -46,16 +46,16 @@
       border: 2px solid #000;
       box-shadow: 6px 6px 0 #000;
       width: 100%;
-      max-width: 380px;
-      padding: 20px 20px 16px;
+      max-width: 360px;
+      padding: 24px 24px 20px;
     }
 
-    /* ── alert body: icon + content ── */
-    .alert-body {
+    /* ── top row: bomb icon + title ── */
+    .alert-top {
       display: flex;
       gap: 16px;
       align-items: flex-start;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
     .alert-icon {
@@ -64,18 +64,31 @@
       height: 48px;
     }
 
-    .alert-content {
+    .alert-title-block {
       flex: 1;
       min-width: 0;
     }
 
     .alert-headline {
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       font-weight: bold;
       letter-spacing: 0.5px;
-      margin-bottom: 8px;
-      line-height: 1.35;
+      line-height: 1.4;
       word-break: break-word;
+      margin: 0;
+    }
+
+    .alert-meta {
+      font-family: 'Courier New', monospace;
+      font-size: 0.58rem;
+      color: #555;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    /* ── photo row ── */
+    .alert-photo-row {
+      margin-bottom: 16px;
     }
 
     .alert-photo {
@@ -83,7 +96,6 @@
       display: block;
       width: 100%;
       height: auto;
-      margin-bottom: 6px;
     }
 
     .alert-caption {
@@ -92,17 +104,10 @@
       color: #555;
       letter-spacing: 1px;
       text-align: center;
+      margin-top: 5px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-    }
-
-    .alert-meta {
-      font-family: 'Courier New', monospace;
-      font-size: 0.6rem;
-      color: #555;
-      letter-spacing: 1px;
-      margin-bottom: 14px;
     }
 
     /* ── divider ── */
@@ -110,66 +115,53 @@
       border: none;
       height: 2px;
       background: #000;
-      margin: 0 -20px 14px;
+      margin: 0 -24px 16px;
     }
 
     /* ── button row ── */
     .alert-buttons {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       justify-content: flex-end;
       align-items: center;
-      flex-wrap: wrap;
     }
 
+    /* Classic Mac rounded-rect button */
     .btn {
       font-family: 'Chicago', 'Geneva', 'Charcoal', 'Lucida Grande', sans-serif;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       letter-spacing: 0.5px;
-      padding: 5px 18px;
+      padding: 5px 20px;
       border: 2px solid #000;
+      border-radius: 20px;       /* the classic stadium/pill shape */
       background: #fff;
       cursor: pointer;
       color: #000;
       text-decoration: none;
       display: inline-block;
       white-space: nowrap;
-      min-width: 72px;
       text-align: center;
+      min-width: 80px;
+      line-height: 1.4;
     }
 
-    .btn:hover { background: #000; color: #fff; }
+    .btn:hover {
+      background: #000;
+      color: #fff;
+    }
 
-    /* default button: triple border (classic Mac) */
+    /* default button gets an extra outer ring */
     .btn-default {
-      box-shadow: 0 0 0 2px #000, 0 0 0 4px #fff, 0 0 0 6px #000;
-      margin: 4px;
+      box-shadow: 0 0 0 2px #000;
+      margin: 3px;
     }
-
-    .btn-nav {
-      font-family: 'Courier New', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 1px;
-      padding: 4px 10px;
-      min-width: 0;
-    }
-
-    .btn-nav.disabled {
-      color: #bbb;
-      border-color: #bbb;
-      cursor: default;
-      pointer-events: none;
-    }
-    .btn-nav.disabled:hover { background: #fff; color: #bbb; }
-
-    .btn-spacer { flex: 1; }
 
     .share-confirm {
       font-family: 'Courier New', monospace;
       font-size: 0.55rem;
       color: #555;
       letter-spacing: 1px;
-      align-self: center;
+      margin-right: auto;
     }
 
     .status {
@@ -195,19 +187,25 @@
 <script>
   function pad(n) { return String(n).padStart(2, '0'); }
 
-  const CAMERA_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" shape-rendering="crispEdges">
-    <rect x="4" y="14" width="40" height="28" fill="#000"/>
-    <rect x="6" y="16" width="36" height="24" fill="#fff"/>
-    <rect x="14" y="8" width="12" height="8" fill="#000"/>
-    <rect x="16" y="10" width="8" height="4" fill="#fff"/>
-    <rect x="28" y="10" width="8" height="6" fill="#000"/>
-    <rect x="30" y="12" width="4" height="2" fill="#fff"/>
-    <rect x="16" y="20" width="16" height="16" fill="#000"/>
-    <rect x="18" y="22" width="12" height="12" fill="#fff"/>
-    <rect x="20" y="24" width="8" height="8" fill="#000"/>
-    <rect x="22" y="26" width="4" height="4" fill="#fff"/>
-    <rect x="36" y="18" width="4" height="4" fill="#000"/>
-    <rect x="37" y="19" width="2" height="2" fill="#fff"/>
+  // Classic Mac bomb icon — pixel-perfect 1-bit reproduction
+  const BOMB_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" shape-rendering="crispEdges">
+    <!-- fuse cord: wiggles up and to the right from bomb top -->
+    <rect x="23" y="10" width="2" height="3" fill="#000"/>
+    <rect x="25" y="8"  width="2" height="3" fill="#000"/>
+    <rect x="27" y="6"  width="2" height="3" fill="#000"/>
+    <rect x="29" y="4"  width="2" height="2" fill="#000"/>
+    <rect x="31" y="3"  width="2" height="2" fill="#000"/>
+    <!-- spark at tip of fuse -->
+    <rect x="33" y="1"  width="3" height="3" fill="#000"/>
+    <rect x="34" y="2"  width="1" height="1" fill="#fff"/>
+    <!-- bomb body: circle approximated with pixel rects -->
+    <rect x="14" y="12" width="20" height="24" fill="#000"/>
+    <rect x="12" y="14" width="24" height="20" fill="#000"/>
+    <rect x="11" y="16" width="26" height="16" fill="#000"/>
+    <!-- white highlight dot (top-left of sphere) -->
+    <rect x="16" y="17" width="4" height="3" fill="#fff"/>
+    <rect x="15" y="18" width="6" height="2" fill="#fff"/>
+    <rect x="16" y="19" width="4" height="1" fill="#fff"/>
   </svg>`;
 
   const params = new URLSearchParams(location.search);
@@ -234,8 +232,6 @@
     const roll = allRolls.find(r => r.id === photo.roll) || null;
     const rollPhotos = allPhotos.filter(p => p.roll === photo.roll);
     const rollIdx = rollPhotos.findIndex(p => p.file === targetFile);
-    const prevPhoto = rollIdx > 0 ? rollPhotos[rollIdx - 1] : null;
-    const nextPhoto = rollIdx < rollPhotos.length - 1 ? rollPhotos[rollIdx + 1] : null;
 
     function photoUrl(p) {
       return `/photo.html?file=${encodeURIComponent(p.file)}&roll=${encodeURIComponent(p.roll)}`;
@@ -251,73 +247,58 @@
 
     alertEl.innerHTML = '';
 
-    // body: icon + content
-    const body = document.createElement('div');
-    body.className = 'alert-body';
+    // ── top row: bomb + title/meta ──
+    const top = document.createElement('div');
+    top.className = 'alert-top';
 
     const iconEl = document.createElement('div');
     iconEl.className = 'alert-icon';
-    iconEl.innerHTML = CAMERA_SVG;
-    body.appendChild(iconEl);
+    iconEl.innerHTML = BOMB_SVG;
+    top.appendChild(iconEl);
 
-    const content = document.createElement('div');
-    content.className = 'alert-content';
+    const titleBlock = document.createElement('div');
+    titleBlock.className = 'alert-title-block';
 
-    if (photo.title) {
-      const headline = document.createElement('p');
-      headline.className = 'alert-headline';
-      headline.textContent = photo.title;
-      content.appendChild(headline);
-    }
+    const headline = document.createElement('p');
+    headline.className = 'alert-headline';
+    headline.textContent = photo.title || photo.file;
+    titleBlock.appendChild(headline);
+
+    const meta = document.createElement('p');
+    meta.className = 'alert-meta';
+    meta.textContent = `${rollName}${rollDate}  ·  frame ${pad(rollIdx + 1)} / ${pad(rollPhotos.length)}`;
+    titleBlock.appendChild(meta);
+
+    top.appendChild(titleBlock);
+    alertEl.appendChild(top);
+
+    // ── photo ──
+    const photoRow = document.createElement('div');
+    photoRow.className = 'alert-photo-row';
 
     const img = document.createElement('img');
     img.className = 'alert-photo';
     img.src = `photos/${photo.file}`;
     img.alt = photo.title || photo.file;
-    content.appendChild(img);
+    photoRow.appendChild(img);
 
     if (photo.caption) {
       const cap = document.createElement('p');
       cap.className = 'alert-caption';
       cap.textContent = photo.caption;
-      content.appendChild(cap);
+      photoRow.appendChild(cap);
     }
 
-    body.appendChild(content);
-    alertEl.appendChild(body);
+    alertEl.appendChild(photoRow);
 
-    // meta
-    const meta = document.createElement('p');
-    meta.className = 'alert-meta';
-    meta.textContent = `${rollName}${rollDate}  ·  frame ${pad(rollIdx + 1)} / ${pad(rollPhotos.length)}`;
-    alertEl.appendChild(meta);
-
-    // divider
+    // ── divider ──
     const hr = document.createElement('hr');
     hr.className = 'alert-divider';
     alertEl.appendChild(hr);
 
-    // buttons
+    // ── buttons ──
     const btns = document.createElement('div');
     btns.className = 'alert-buttons';
-
-    // prev
-    const prevEl = prevPhoto ? document.createElement('a') : document.createElement('span');
-    prevEl.className = 'btn btn-nav' + (prevPhoto ? '' : ' disabled');
-    if (prevPhoto) prevEl.href = photoUrl(prevPhoto);
-    prevEl.textContent = '← prev';
-    btns.appendChild(prevEl);
-
-    // next
-    const nextEl = nextPhoto ? document.createElement('a') : document.createElement('span');
-    nextEl.className = 'btn btn-nav' + (nextPhoto ? '' : ' disabled');
-    if (nextPhoto) nextEl.href = photoUrl(nextPhoto);
-    nextEl.textContent = 'next →';
-    btns.appendChild(nextEl);
-
-    const spacer = document.createElement('span');
-    spacer.className = 'btn-spacer';
-    btns.appendChild(spacer);
 
     const confirm = document.createElement('span');
     confirm.className = 'share-confirm';
