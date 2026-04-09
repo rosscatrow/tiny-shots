@@ -76,7 +76,7 @@
     }
 
     .alert-headline {
-      font-size: 0.8rem;
+      font-size: 1rem;
       font-weight: bold;
       letter-spacing: 0.5px;
       line-height: 1.4;
@@ -89,7 +89,8 @@
       font-size: 0.58rem;
       color: #555;
       letter-spacing: 1px;
-      margin-top: 4px;
+      margin-top: 6px;
+      text-align: center;
     }
 
     /* ── photo row ── */
@@ -163,14 +164,6 @@
       outline: 3px solid #000;
       outline-offset: 1px;
       font-weight: bold;
-    }
-
-    .share-confirm {
-      font-family: 'Courier New', monospace;
-      font-size: 0.55rem;
-      color: #555;
-      letter-spacing: 1px;
-      margin-right: auto;
     }
 
     .status {
@@ -257,11 +250,6 @@
     headline.textContent = photo.title || photo.file;
     titleBlock.appendChild(headline);
 
-    const meta = document.createElement('p');
-    meta.className = 'alert-meta';
-    meta.textContent = `${rollName}${rollDate}  ·  frame ${pad(rollIdx + 1)} / ${pad(rollPhotos.length)}`;
-    titleBlock.appendChild(meta);
-
     top.appendChild(titleBlock);
     alertEl.appendChild(top);
 
@@ -282,6 +270,11 @@
       photoRow.appendChild(cap);
     }
 
+    const meta = document.createElement('p');
+    meta.className = 'alert-meta';
+    meta.textContent = `${rollName}${rollDate}  ·  frame ${pad(rollIdx + 1)} / ${pad(rollPhotos.length)}`;
+    photoRow.appendChild(meta);
+
     alertEl.appendChild(photoRow);
 
     // ── divider ──
@@ -292,24 +285,6 @@
     // ── buttons ──
     const btns = document.createElement('div');
     btns.className = 'alert-buttons';
-
-    const confirm = document.createElement('span');
-    confirm.className = 'share-confirm';
-    btns.appendChild(confirm);
-
-    const shareBtn = document.createElement('button');
-    shareBtn.className = 'btn';
-    shareBtn.textContent = 'Share';
-    shareBtn.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-        confirm.textContent = '[ copied ]';
-        setTimeout(() => { confirm.textContent = ''; }, 2000);
-      } catch {
-        confirm.textContent = '[ select + copy ]';
-      }
-    });
-    btns.appendChild(shareBtn);
 
     const okBtn = document.createElement('a');
     okBtn.className = 'btn btn-default';
