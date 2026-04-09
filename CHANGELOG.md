@@ -1,5 +1,14 @@
 # changelog
 
+## v1.6.0
+
+- restyle photo detail page as classic mac os system 7 alert dialog
+- double-outline border (outer + inner) matching real system 7 alerts
+- use authentic mac os bomb icon
+- larger title font, metadata moved below photo
+- proper rounded-rect buttons with default-button outline ring
+- remove share button from photo page
+
 ## v1.5.0
 
 - default home page to most recent roll instead of all photos (closes #25)
