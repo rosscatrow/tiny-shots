@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>shot — tiny shots</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+
+  <!-- Open Graph / share preview -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="tiny shots">
+  <meta property="og:title" id="og-title" content="a shot">
+  <meta property="og:description" content="shot on kodak charmera · 1.6mp">
+  <meta property="og:image" id="og-image" content="">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: #c0c0c0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23c0c0c0'/%3E%3Crect width='1' height='1' x='0' y='0' fill='%23a0a0a0'/%3E%3Crect width='1' height='1' x='2' y='2' fill='%23a0a0a0'/%3E%3C/svg%3E");
+      color: #000;
+      font-family: 'Chicago', 'Geneva', 'Charcoal', 'Lucida Grande', sans-serif;
+      min-height: 100vh;
+      cursor: default;
+      position: relative;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+      z-index: 9999;
+      mix-blend-mode: multiply;
+    }
+
+    /* ── mac window chrome ── */
+    .window {
+      max-width: 420px;
+      margin: 24px auto;
+      border: 2px solid #000;
+      box-shadow: 4px 4px 0 #000;
+      background-color: #fff;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23fff'/%3E%3Crect width='1' height='1' x='0' y='0' fill='%23999'/%3E%3Crect width='1' height='1' x='2' y='2' fill='%23999'/%3E%3C/svg%3E");
+    }
+
+    .title-bar {
+      background: #fff;
+      border-bottom: 2px solid #000;
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-image:
+        repeating-linear-gradient(
+          transparent 0px, transparent 1px,
+          #000 1px, #000 2px,
+          transparent 2px, transparent 3px
+        );
+    }
+
+    .title-bar-text {
+      background: #fff;
+      padding: 0 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .close-box {
+      width: 14px;
+      height: 14px;
+      border: 2px solid #000;
+      background: #fff;
+      flex-shrink: 0;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-box:hover {
+      background: #000;
+    }
+
+    .window-body {
+      padding: 20px 24px 28px;
+    }
+
+    /* ── photo display ── */
+    .photo-frame {
+      border: 2px solid #000;
+      padding: 10px 10px 28px;
+      background: #fff;
+      margin-bottom: 14px;
+    }
+
+    .photo-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid #000;
+    }
+
+    .photo-caption {
+      font-size: 0.6rem;
+      color: #333;
+      margin-top: 6px;
+      text-align: center;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── title ── */
+    .photo-title {
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      font-weight: normal;
+      color: #000;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      min-height: 1.2em;
+    }
+
+    /* ── meta bar ── */
+    .meta-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .roll-link {
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      color: #000;
+      text-decoration: none;
+      border: 2px solid #000;
+      padding: 3px 10px;
+      background: #fff;
+      display: inline-block;
+    }
+
+    .roll-link:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    .frame-counter {
+      font-family: 'Courier New', monospace;
+      font-size: 0.6rem;
+      color: #555;
+      letter-spacing: 2px;
+    }
+
+    /* ── navigation ── */
+    .nav-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .nav-btn {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      padding: 4px 12px;
+      border: 2px solid #000;
+      background: #fff;
+      cursor: pointer;
+      color: #000;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .nav-btn:hover:not(.disabled) {
+      background: #000;
+      color: #fff;
+    }
+
+    .nav-btn.disabled {
+      color: #aaa;
+      border-color: #aaa;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    hr.divider {
+      border: none;
+      height: 2px;
+      background: #000;
+      margin: 14px 0;
+    }
+
+    /* ── share section ── */
+    .share-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .share-url {
+      flex: 1;
+      font-family: 'Courier New', monospace;
+      font-size: 0.6rem;
+      padding: 4px 7px;
+      border: 2px solid #000;
+      background: #f5f5f5;
+      color: #555;
+      letter-spacing: 0.5px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: default;
+      user-select: all;
+    }
+
+    .share-btn {
+      font-family: 'Courier New', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      padding: 4px 12px;
+      border: 2px solid #000;
+      background: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .share-btn:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    .share-confirm {
+      font-family: 'Courier New', monospace;
+      font-size: 0.6rem;
+      color: #555;
+      letter-spacing: 1px;
+      text-align: center;
+      height: 1.2em;
+      margin-top: 6px;
+    }
+
+    /* ── loading / error ── */
+    .status {
+      text-align: center;
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      color: #555;
+      letter-spacing: 2px;
+      padding: 60px 0;
+    }
+
+    /* ── scrollbar ── */
+    ::-webkit-scrollbar { width: 16px; }
+    ::-webkit-scrollbar-track { background: #c0c0c0; border-left: 1px solid #000; }
+    ::-webkit-scrollbar-thumb { background: #fff; border: 2px solid #000; }
+
+    @media (max-width: 520px) {
+      .window { margin: 8px; }
+      .window-body { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+<div class="window">
+  <div class="title-bar">
+    <a class="close-box" id="closeBtn" href="/"></a>
+    <span class="title-bar-text" id="titleBarText">shot</span>
+  </div>
+  <div class="window-body" id="windowBody">
+    <div class="status" id="status">[ loading ]</div>
+  </div>
+</div>
+
+<script>
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  const params = new URLSearchParams(location.search);
+  const targetFile = params.get('file');
+  const targetRoll = params.get('roll');
+
+  Promise.all([
+    fetch('photos.json?v=' + Date.now()).then(r => r.json()).catch(() => []),
+    fetch('rolls.json?v=' + Date.now()).then(r => r.json()).catch(() => [])
+  ]).then(([allPhotos, allRolls]) => {
+    const status = document.getElementById('status');
+    const body = document.getElementById('windowBody');
+
+    if (!targetFile) {
+      status.textContent = '[ no photo specified ]';
+      return;
+    }
+
+    // find the photo
+    const photoIdx = allPhotos.findIndex(p => p.file === targetFile);
+    if (photoIdx === -1) {
+      status.textContent = '[ shot not found ]';
+      return;
+    }
+
+    const photo = allPhotos[photoIdx];
+    const roll = allRolls.find(r => r.id === photo.roll) || null;
+    const rollPhotos = allPhotos.filter(p => p.roll === photo.roll);
+    const rollIdx = rollPhotos.findIndex(p => p.file === targetFile);
+
+    // prev/next within roll
+    const prevPhoto = rollIdx > 0 ? rollPhotos[rollIdx - 1] : null;
+    const nextPhoto = rollIdx < rollPhotos.length - 1 ? rollPhotos[rollIdx + 1] : null;
+
+    function photoUrl(p) {
+      return `/photo.html?file=${encodeURIComponent(p.file)}&roll=${encodeURIComponent(p.roll)}`;
+    }
+
+    const rollName = roll ? (roll.name || roll.id) : (photo.roll || 'unknown roll');
+    const rollDate = roll && roll.date ? ' · ' + roll.date : '';
+    const frameNum = pad(rollIdx + 1);
+    const totalFrames = rollPhotos.length;
+
+    // update title bar
+    document.getElementById('titleBarText').textContent = photo.title || photo.file;
+    document.title = (photo.title || photo.file) + ' — tiny shots';
+
+    // update OG image
+    document.getElementById('og-image').content = location.origin + '/photos/' + photo.file;
+    document.getElementById('og-title').content = photo.title || 'a shot';
+
+    const shareUrl = location.origin + photoUrl(photo);
+
+    // render
+    body.innerHTML = '';
+
+    // meta bar: roll back-link + frame counter
+    const metaBar = document.createElement('div');
+    metaBar.className = 'meta-bar';
+
+    const rollLink = document.createElement('a');
+    rollLink.className = 'roll-link';
+    rollLink.href = `/#${photo.roll}`;
+    rollLink.textContent = `← ${rollName}${rollDate}`;
+    metaBar.appendChild(rollLink);
+
+    const counter = document.createElement('span');
+    counter.className = 'frame-counter';
+    counter.textContent = `frame ${frameNum} / ${pad(totalFrames)}`;
+    metaBar.appendChild(counter);
+
+    body.appendChild(metaBar);
+
+    // title
+    if (photo.title) {
+      const titleEl = document.createElement('p');
+      titleEl.className = 'photo-title';
+      titleEl.textContent = photo.title;
+      body.appendChild(titleEl);
+    }
+
+    // photo frame (polaroid style)
+    const frame = document.createElement('div');
+    frame.className = 'photo-frame';
+
+    const img = document.createElement('img');
+    img.src = `photos/${photo.file}`;
+    img.alt = photo.title || photo.file;
+    frame.appendChild(img);
+
+    if (photo.caption) {
+      const cap = document.createElement('p');
+      cap.className = 'photo-caption';
+      cap.textContent = photo.caption;
+      frame.appendChild(cap);
+    }
+
+    body.appendChild(frame);
+
+    // prev/next nav
+    const navRow = document.createElement('div');
+    navRow.className = 'nav-row';
+
+    if (prevPhoto) {
+      const prev = document.createElement('a');
+      prev.className = 'nav-btn';
+      prev.href = photoUrl(prevPhoto);
+      prev.textContent = '← prev';
+      navRow.appendChild(prev);
+    } else {
+      const prev = document.createElement('span');
+      prev.className = 'nav-btn disabled';
+      prev.textContent = '← prev';
+      navRow.appendChild(prev);
+    }
+
+    if (nextPhoto) {
+      const next = document.createElement('a');
+      next.className = 'nav-btn';
+      next.href = photoUrl(nextPhoto);
+      next.textContent = 'next →';
+      navRow.appendChild(next);
+    } else {
+      const next = document.createElement('span');
+      next.className = 'nav-btn disabled';
+      next.textContent = 'next →';
+      navRow.appendChild(next);
+    }
+
+    body.appendChild(navRow);
+
+    // share section
+    const hr = document.createElement('hr');
+    hr.className = 'divider';
+    body.appendChild(hr);
+
+    const shareRow = document.createElement('div');
+    shareRow.className = 'share-row';
+
+    const urlBox = document.createElement('div');
+    urlBox.className = 'share-url';
+    urlBox.textContent = shareUrl;
+    urlBox.title = shareUrl;
+    shareRow.appendChild(urlBox);
+
+    const shareBtn = document.createElement('button');
+    shareBtn.className = 'share-btn';
+    shareBtn.textContent = '[copy]';
+    shareRow.appendChild(shareBtn);
+
+    body.appendChild(shareRow);
+
+    const confirm = document.createElement('p');
+    confirm.className = 'share-confirm';
+    body.appendChild(confirm);
+
+    shareBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        confirm.textContent = '[ link copied ]';
+        setTimeout(() => { confirm.textContent = ''; }, 2000);
+      } catch {
+        // fallback: select the text
+        const range = document.createRange();
+        range.selectNodeContents(urlBox);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        confirm.textContent = '[ select + copy ]';
+      }
+    });
+
+    // close box goes back to roll
+    document.getElementById('closeBtn').href = `/#${photo.roll}`;
+  });
+</script>
+</body>
+</html>
