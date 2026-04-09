@@ -30,65 +30,52 @@
       mix-blend-mode: multiply;
     }
 
-    /* ── mac window chrome ── */
-    .window {
+    /* ── classic mac alert box (double border) ── */
+    .alert-box {
       max-width: 520px;
       margin: 24px auto;
-      border: 2px solid #000;
+      border: 3px solid #000;
       box-shadow: 4px 4px 0 #000;
+      background: #fff;
+      padding: 3px;
+    }
+
+    .alert-inner {
+      border: 1px solid #000;
       background-color: #fff;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23fff'/%3E%3Crect width='1' height='1' x='0' y='0' fill='%23999'/%3E%3Crect width='1' height='1' x='2' y='2' fill='%23999'/%3E%3C/svg%3E");
+      padding: 20px 24px 24px;
     }
 
-    .title-bar {
-      background: #fff;
-      border-bottom: 2px solid #000;
-      padding: 4px 8px;
+    /* ── icon + header row (alert style) ── */
+    .alert-header {
       display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: grab;
-      background-image:
-        repeating-linear-gradient(
-          transparent 0px, transparent 1px,
-          #000 1px, #000 2px,
-          transparent 2px, transparent 3px
-        );
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 12px;
     }
 
-    .title-bar-text {
-      background: #fff;
-      padding: 0 8px;
-      font-size: 0.8rem;
-      font-weight: bold;
-      letter-spacing: 1px;
-      white-space: nowrap;
-    }
-
-    .title-bar-link {
-      margin-left: auto;
-      background: #fff;
-      padding: 0 8px;
-      font-family: 'Courier New', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 1px;
-      color: #555;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-
-    .title-bar-link:hover { color: #000; }
-
-    .close-box {
-      width: 14px;
-      height: 14px;
+    .alert-icon {
+      width: 32px;
+      height: 32px;
       border: 2px solid #000;
       background: #fff;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* pixel camera icon via box-shadows */
+      image-rendering: pixelated;
     }
 
-    .window-body {
-      padding: 16px 20px 24px;
+    .alert-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .alert-header-text {
+      flex: 1;
+      min-width: 0;
     }
 
     /* ── header ── */
@@ -369,6 +356,64 @@
       letter-spacing: 1px;
     }
 
+    /* ── alert-box footer with button row ── */
+    .alert-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 12px;
+    }
+
+    .alert-footer-left {
+      margin-right: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 1px;
+      color: #888;
+    }
+
+    .alert-footer-left a {
+      color: #888;
+      text-decoration: none;
+    }
+
+    .alert-footer-left a:hover {
+      color: #000;
+    }
+
+    /* classic mac-style button */
+    .mac-btn {
+      font-family: 'Chicago', 'Geneva', 'Charcoal', 'Lucida Grande', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      padding: 4px 16px;
+      border: 1px solid #000;
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .mac-btn:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    .mac-btn:active {
+      background: #000;
+      color: #fff;
+    }
+
+    /* default button — extra outline ring */
+    .mac-btn-default {
+      border-width: 2px;
+      box-shadow: 0 0 0 2px #000;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
 
     /* ── scrollbar ── */
     ::-webkit-scrollbar { width: 16px; }
@@ -382,25 +427,36 @@
     @media (max-width: 520px) {
       .gallery { column-gap: 10px; }
       header h1 { font-size: 2rem; letter-spacing: 3px; }
-      .window { margin: 8px; }
-      .window-body { padding: 12px; }
+      .alert-box { margin: 8px; }
+      .alert-inner { padding: 16px; }
     }
   </style>
 </head>
 <body>
-<div class="window">
-  <div class="title-bar">
-    <div class="close-box"></div>
-    <span class="title-bar-text">shots shots shots</span>
-    <a class="title-bar-link" href="/admin.html">admin</a>
-  </div>
-  <div class="window-body">
+<div class="alert-box">
+  <div class="alert-inner">
 
-    <header>
-      <h1>tiny shots</h1>
-      <p class="subtitle">photos best viewed small</p>
-      <span class="tag">kodak charmera &bull; 1.6mp &bull; 2026</span>
-    </header>
+    <div class="alert-header">
+      <div class="alert-icon">
+        <!-- 1-bit pixel camera icon -->
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+          <rect x="5" y="1" width="6" height="2" fill="black"/>
+          <rect x="1" y="3" width="14" height="11" fill="black"/>
+          <rect x="2" y="4" width="12" height="9" fill="white"/>
+          <rect x="5" y="6" width="6" height="6" fill="black"/>
+          <rect x="6" y="7" width="4" height="4" fill="white"/>
+          <rect x="7" y="8" width="2" height="2" fill="black"/>
+          <rect x="11" y="5" width="2" height="2" fill="black"/>
+        </svg>
+      </div>
+      <div class="alert-header-text">
+        <header>
+          <h1>tiny shots</h1>
+          <p class="subtitle">photos best viewed small</p>
+          <span class="tag">kodak charmera &bull; 1.6mp &bull; 2026</span>
+        </header>
+      </div>
+    </div>
 
     <hr class="dashed">
 
@@ -411,9 +467,10 @@
 
     <hr class="divider">
 
-    <footer>
-      shot on kodak charmera
-    </footer>
+    <div class="alert-footer">
+      <span class="alert-footer-left">shot on kodak charmera · <a href="/admin.html">admin</a></span>
+      <button class="mac-btn mac-btn-default" onclick="location.hash=''">ok</button>
+    </div>
 
   </div>
 </div>
