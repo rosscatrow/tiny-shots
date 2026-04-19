@@ -1,5 +1,13 @@
 # changelog
 
+## v1.7.0
+
+- add rss feed at /feed.xml, one item per roll (closes #27)
+- generator script at scripts/generate-feed.py reads rolls.json + photos.json
+- password-protected rolls excluded from feed
+- feed auto-discovery `<link rel="alternate">` in index.html
+- rss link added to title bar next to admin
+
 ## v1.6.0
 
 - restyle photo detail page as classic mac os system 7 alert dialog

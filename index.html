@@ -6,6 +6,7 @@
   <title>shots shots shots</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="alternate" type="application/rss+xml" title="tiny shots" href="/feed.xml">
   <style>
     /* ── reset ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -66,7 +67,6 @@
     }
 
     .title-bar-link {
-      margin-left: auto;
       background: #fff;
       padding: 0 8px;
       font-family: 'Courier New', monospace;
@@ -76,6 +76,8 @@
       text-decoration: none;
       white-space: nowrap;
     }
+
+    .title-bar-link:first-of-type { margin-left: auto; }
 
     .title-bar-link:hover { color: #000; }
 
@@ -361,6 +363,7 @@
   <div class="title-bar">
     <div class="close-box"></div>
     <span class="title-bar-text">shots shots shots</span>
+    <a class="title-bar-link" href="/feed.xml">rss</a>
     <a class="title-bar-link" href="/admin.html">admin</a>
   </div>
   <div class="window-body">
