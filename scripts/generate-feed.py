@@ -9,7 +9,7 @@ Builds feed.xml from rolls.json + photos.json.
 - newest rolls first
 - pubDate derived from the roll's id timestamp when available (roll-<unix_ms>),
   otherwise parsed from the `date` field ("YYYY", "YYYY-MM", "YYYY-MM-DD")
-- description includes an inline thumbnail grid + photo titles linking to /photo.html
+- description pairs each photo with its title/link in a single block
 
 Usage: python3 scripts/generate-feed.py
 Run from the repo root.
@@ -60,7 +60,7 @@ def roll_datetime(roll: dict) -> datetime:
 
 
 def build_item_description(roll: dict, photos: list[dict]) -> str:
-    """HTML shown inside <description> — a thumbnail grid + titled links."""
+    """HTML shown inside <description> — each photo paired with its caption."""
     count = len(photos)
     if count == 0:
         return "<p>no shots on this roll yet.</p>"
@@ -68,36 +68,28 @@ def build_item_description(roll: dict, photos: list[dict]) -> str:
     noun = "shot" if count == 1 else "shots"
     parts: list[str] = [f"<p>{count} {noun}</p>"]
 
-    # Thumbnail grid (readers that render HTML will show the images).
-    thumbs = []
+    # One block per photo: thumbnail on top, titled link directly below.
     for p in photos:
         photo_url = (
             f"{SITE_URL}/photo.html"
             f"?file={xml_escape(p['file'])}&amp;roll={xml_escape(roll['id'])}"
         )
         img_url = f"{SITE_URL}/photos/{xml_escape(p['file'])}"
-        alt = xml_escape(p.get("title", "") or p["file"])
-        thumbs.append(
-            f'<a href="{photo_url}">'
-            f'<img src="{img_url}" alt="{alt}" '
-            f'style="width:120px;height:120px;object-fit:cover;'
-            f'border:2px solid #000;margin:2px;" />'
-            f"</a>"
-        )
-    parts.append(
-        '<p style="line-height:0;">' + "".join(thumbs) + "</p>"
-    )
-
-    # Titled list for text-only readers.
-    list_items = []
-    for p in photos:
-        photo_url = (
-            f"{SITE_URL}/photo.html"
-            f"?file={xml_escape(p['file'])}&amp;roll={xml_escape(roll['id'])}"
-        )
         title = xml_escape(p.get("title", "") or p["file"])
-        list_items.append(f"<li><a href=\"{photo_url}\">{title}</a></li>")
-    parts.append("<ul>" + "".join(list_items) + "</ul>")
+        parts.append(
+            '<p style="margin:0 0 16px 0;">'
+            f'<a href="{photo_url}">'
+            f'<img src="{img_url}" alt="{title}" '
+            'style="max-width:400px;width:100%;height:auto;'
+            'border:2px solid #000;display:block;" />'
+            "</a>"
+            '<br />'
+            f'<a href="{photo_url}" '
+            'style="font-family:monospace;font-size:0.85em;">'
+            f"{title}"
+            "</a>"
+            "</p>"
+        )
 
     return "\n".join(parts)
 

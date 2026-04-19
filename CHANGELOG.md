@@ -1,5 +1,9 @@
 # changelog
 
+## v1.7.1
+
+- rss feed: pair each photo with its caption/link inline instead of grouping captions at the bottom (closes #29)
+
 ## v1.7.0
 
 - add rss feed at /feed.xml, one item per roll (closes #27)
